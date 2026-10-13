@@ -1,0 +1,1026 @@
+openapi: 3.1.0
+info:
+  title: Merkizi API
+  version: 1.0.0
+  license:
+    name: Proprietary
+  description: |
+    API REST del backend de Merkizi. Autenticación SPA mediante cookies de sesión (Sanctum).
+
+    Convenciones de contrato (GUIA_CREACION.md §7):
+    - URL base `/api/v1`.
+    - Listados serializados como `{ "data": [...], "meta": {...}, "links": {...} }`.
+    - Errores con código estable y `request_id`.
+    - 401 sesión ausente, 403 acceso denegado, 422 validación, 409 conflicto de estado.
+    - Montos exactos como cadenas decimales con moneda explícita; nunca `float`.
+    - Instantes en UTC.
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Desarrollo local (proxy de Angular hacia Laravel)
+
+security:
+  - sessionCookie: []
+    xsrfToken: []
+
+paths:
+  /login:
+    post:
+      summary: Iniciar sesión
+      description: Autentica con la sesión SPA y regenera la sesión. Requiere haber obtenido antes la cookie CSRF en `/sanctum/csrf-cookie`.
+      operationId: login
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Usuario autenticado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Credenciales inválidas.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+
+  /logout:
+    post:
+      summary: Cerrar sesión
+      description: Invalida la sesión y las cookies.
+      operationId: logout
+      responses:
+        '204':
+          description: Sesión cerrada.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /user:
+    get:
+      summary: Usuario autenticado
+      description: Devuelve el usuario de la sesión actual.
+      operationId: user
+      responses:
+        '200':
+          description: Usuario autenticado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /categories:
+    get:
+      summary: Listar categorías
+      operationId: listCategories
+      responses:
+        '200':
+          description: Listado de categorías de la empresa.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Category'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      summary: Crear categoría
+      operationId: createCategory
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreCategoryRequest'
+      responses:
+        '201':
+          description: Categoría creada.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+
+  /categories/{category}:
+    get:
+      summary: Ver categoría
+      operationId: getCategory
+      parameters:
+        - $ref: '#/components/parameters/CategoryId'
+      responses:
+        '200':
+          description: Categoría.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    put:
+      summary: Actualizar categoría
+      operationId: updateCategory
+      parameters:
+        - $ref: '#/components/parameters/CategoryId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCategoryRequest'
+      responses:
+        '200':
+          description: Categoría actualizada.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+    delete:
+      summary: Desactivar categoría
+      operationId: deleteCategory
+      parameters:
+        - $ref: '#/components/parameters/CategoryId'
+      responses:
+        '204':
+          description: Categoría desactivada.
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /products:
+    get:
+      summary: Listar productos
+      operationId: listProducts
+      responses:
+        '200':
+          description: Listado de productos de la empresa.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Product'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      summary: Crear producto
+      operationId: createProduct
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreProductRequest'
+      responses:
+        '201':
+          description: Producto creado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+
+  /products/{product}:
+    get:
+      summary: Ver producto
+      operationId: getProduct
+      parameters:
+        - $ref: '#/components/parameters/ProductId'
+      responses:
+        '200':
+          description: Producto.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    put:
+      summary: Actualizar producto
+      operationId: updateProduct
+      parameters:
+        - $ref: '#/components/parameters/ProductId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProductRequest'
+      responses:
+        '200':
+          description: Producto actualizado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+    delete:
+      summary: Desactivar producto
+      operationId: deleteProduct
+      parameters:
+        - $ref: '#/components/parameters/ProductId'
+      responses:
+        '204':
+          description: Producto desactivado.
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /employees:
+    get:
+      summary: Listar empleados
+      operationId: listEmployees
+      responses:
+        '200':
+          description: Listado de empleados de la empresa.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Employee'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      summary: Crear empleado
+      operationId: createEmployee
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreEmployeeRequest'
+      responses:
+        '201':
+          description: Empleado creado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Employee'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+
+  /employees/{employee}:
+    get:
+      summary: Ver empleado
+      operationId: getEmployee
+      parameters:
+        - $ref: '#/components/parameters/EmployeeId'
+      responses:
+        '200':
+          description: Empleado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Employee'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    put:
+      summary: Actualizar empleado
+      operationId: updateEmployee
+      parameters:
+        - $ref: '#/components/parameters/EmployeeId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEmployeeRequest'
+      responses:
+        '200':
+          description: Empleado actualizado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Employee'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+    delete:
+      summary: Desactivar empleado
+      operationId: deleteEmployee
+      parameters:
+        - $ref: '#/components/parameters/EmployeeId'
+      responses:
+        '204':
+          description: Empleado desactivado.
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /cash-registers:
+    get:
+      summary: Listar cajas
+      operationId: listCashRegisters
+      responses:
+        '200':
+          description: Listado de cajas de la empresa.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CashRegister'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      summary: Crear caja (sujeta a límite del plan)
+      operationId: createCashRegister
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreCashRegisterRequest'
+      responses:
+        '201':
+          description: Caja creada.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CashRegister'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+
+  /cash-registers/{cash_register}/sessions:
+    get:
+      summary: Listar sesiones de una caja
+      operationId: listCashSessions
+      parameters:
+        - $ref: '#/components/parameters/CashRegisterId'
+      responses:
+        '200':
+          description: Listado de sesiones.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CashSession'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      summary: Abrir sesión de caja
+      operationId: openCashSession
+      parameters:
+        - $ref: '#/components/parameters/CashRegisterId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreCashSessionRequest'
+      responses:
+        '201':
+          description: Sesión abierta.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CashSession'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /cash-sessions/{cash_session}/close:
+    post:
+      summary: Cerrar sesión de caja
+      operationId: closeCashSession
+      parameters:
+        - $ref: '#/components/parameters/CashSessionId'
+      responses:
+        '200':
+          description: Sesión cerrada con saldo de cierre calculado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CashSession'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /orders:
+    get:
+      summary: Listar pedidos
+      operationId: listOrders
+      responses:
+        '200':
+          description: Listado de pedidos de la empresa.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Order'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      summary: Crear pedido (snapshot de productos y precios)
+      operationId: createOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreOrderRequest'
+      responses:
+        '201':
+          description: Pedido creado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+
+  /orders/{order}:
+    get:
+      summary: Ver pedido
+      operationId: getOrder
+      parameters:
+        - $ref: '#/components/parameters/OrderId'
+      responses:
+        '200':
+          description: Pedido con items y pagos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /orders/{order}/payments:
+    post:
+      summary: Registrar pago de un pedido
+      operationId: recordPayment
+      parameters:
+        - $ref: '#/components/parameters/OrderId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StorePaymentRequest'
+      responses:
+        '201':
+          description: Pago registrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+
+components:
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: merkizi-session
+    xsrfToken:
+      type: apiKey
+      in: header
+      name: X-XSRF-TOKEN
+
+  responses:
+    Unauthorized:
+      description: Sesión ausente o no autenticada.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: Acceso denegado (403).
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    ValidationFailed:
+      description: Errores de validación (422).
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ValidationError'
+    Conflict:
+      description: Conflicto de estado (409).
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  parameters:
+    CategoryId:
+      name: category
+      in: path
+      required: true
+      schema:
+        type: integer
+    ProductId:
+      name: product
+      in: path
+      required: true
+      schema:
+        type: integer
+    EmployeeId:
+      name: employee
+      in: path
+      required: true
+      schema:
+        type: integer
+    CashRegisterId:
+      name: cash_register
+      in: path
+      required: true
+      schema:
+        type: integer
+    CashSessionId:
+      name: cash_session
+      in: path
+      required: true
+      schema:
+        type: integer
+    OrderId:
+      name: order
+      in: path
+      required: true
+      schema:
+        type: integer
+
+  schemas:
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+        remember:
+          type: boolean
+          default: false
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        email_verified_at:
+          type:
+            - string
+            - 'null'
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    Error:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+        code:
+          type: string
+        request_id:
+          type: string
+
+    ValidationError:
+      allOf:
+        - $ref: '#/components/schemas/Error'
+        - type: object
+          properties:
+            errors:
+              type: object
+              additionalProperties:
+                type: array
+                items:
+                  type: string
+
+    Timestamps:
+      type: object
+      properties:
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    Money:
+      type: string
+      description: Monto exacto como cadena decimal de 2 posiciones.
+
+    Category:
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+            status:
+              type: string
+              enum: [active, inactive]
+            parent_id:
+              type:
+                - integer
+                - 'null'
+        - $ref: '#/components/schemas/Timestamps'
+
+    StoreCategoryRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        parent_id:
+          type:
+            - integer
+            - 'null'
+
+    UpdateCategoryRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        parent_id:
+          type:
+            - integer
+            - 'null'
+        status:
+          type: string
+          enum: [active, inactive]
+
+    Product:
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+            sku:
+              type:
+                - string
+                - 'null'
+            price:
+              $ref: '#/components/schemas/Money'
+            category_id:
+              type:
+                - integer
+                - 'null'
+            status:
+              type: string
+              enum: [active, inactive]
+        - $ref: '#/components/schemas/Timestamps'
+
+    StoreProductRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        sku:
+          type: string
+        category_id:
+          type: integer
+        price:
+          $ref: '#/components/schemas/Money'
+
+    UpdateProductRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        sku:
+          type: string
+        category_id:
+          type:
+            - integer
+            - 'null'
+        price:
+          $ref: '#/components/schemas/Money'
+        status:
+          type: string
+          enum: [active, inactive]
+
+    Employee:
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+            role:
+              type: string
+              enum: [employee, admin]
+            status:
+              type: string
+              enum: [active, inactive]
+            branch_id:
+              type:
+                - integer
+                - 'null'
+            user_id:
+              type:
+                - integer
+                - 'null'
+        - $ref: '#/components/schemas/Timestamps'
+
+    StoreEmployeeRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        branch_id:
+          type: integer
+        user_id:
+          type: integer
+        role:
+          type: string
+          enum: [employee, admin]
+
+    UpdateEmployeeRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        branch_id:
+          type:
+            - integer
+            - 'null'
+        user_id:
+          type:
+            - integer
+            - 'null'
+        role:
+          type: string
+          enum: [employee, admin]
+        status:
+          type: string
+          enum: [active, inactive]
+
+    CashRegister:
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+            status:
+              type: string
+              enum: [active, inactive]
+            branch_id:
+              type: integer
+        - $ref: '#/components/schemas/Timestamps'
+
+    StoreCashRegisterRequest:
+      type: object
+      required:
+        - name
+        - branch_id
+      properties:
+        name:
+          type: string
+        branch_id:
+          type: integer
+
+    CashSession:
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: integer
+            cash_register_id:
+              type: integer
+            branch_id:
+              type: integer
+            status:
+              type: string
+              enum: [open, closed]
+            opening_balance:
+              $ref: '#/components/schemas/Money'
+            closing_balance:
+              oneOf:
+                - $ref: '#/components/schemas/Money'
+                - type: 'null'
+            opened_at:
+              type: string
+              format: date-time
+            closed_at:
+              type:
+                - string
+                - 'null'
+              format: date-time
+        - $ref: '#/components/schemas/Timestamps'
+
+    StoreCashSessionRequest:
+      type: object
+      properties:
+        opening_balance:
+          $ref: '#/components/schemas/Money'
+
+    Payment:
+      type: object
+      properties:
+        id:
+          type: integer
+        order_id:
+          type: integer
+        method:
+          type: string
+          enum: [cash, card, qr]
+        amount:
+          $ref: '#/components/schemas/Money'
+        status:
+          type: string
+          enum: [pending, confirmed]
+        reference:
+          type:
+            - string
+            - 'null'
+        confirmed_at:
+          type:
+            - string
+            - 'null'
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+
+    StorePaymentRequest:
+      type: object
+      required:
+        - method
+        - amount
+      properties:
+        method:
+          type: string
+          enum: [cash, card, qr]
+        amount:
+          $ref: '#/components/schemas/Money'
+        reference:
+          type: string
+
+    OrderItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        product_id:
+          type:
+            - integer
+            - 'null'
+        name:
+          type: string
+        price:
+          $ref: '#/components/schemas/Money'
+        quantity:
+          type: string
+          description: Cantidad decimal exacta (3 posiciones).
+        extras:
+          type:
+            - object
+            - 'null'
+        subtotal:
+          $ref: '#/components/schemas/Money'
+
+    Order:
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: integer
+            status:
+              type: string
+              enum: [draft, paid]
+            customer_name:
+              type:
+                - string
+                - 'null'
+            subtotal:
+              $ref: '#/components/schemas/Money'
+            discount:
+              $ref: '#/components/schemas/Money'
+            tax:
+              $ref: '#/components/schemas/Money'
+            total:
+              $ref: '#/components/schemas/Money'
+            paid_at:
+              type:
+                - string
+                - 'null'
+              format: date-time
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/OrderItem'
+            payments:
+              type: array
+              items:
+                $ref: '#/components/schemas/Payment'
+        - $ref: '#/components/schemas/Timestamps'
+
+    StoreOrderRequest:
+      type: object
+      required:
+        - cash_session_id
+        - items
+      properties:
+        cash_session_id:
+          type: integer
+        customer_name:
+          type: string
+        discount:
+          $ref: '#/components/schemas/Money'
+        tax:
+          $ref: '#/components/schemas/Money'
+        items:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required:
+              - product_id
+              - quantity
+            properties:
+              product_id:
+                type: integer
+              quantity:
+                type: string
+                description: Cantidad decimal exacta (3 posiciones).
+              extras:
+                type: object

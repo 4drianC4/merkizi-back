@@ -16,3 +16,11 @@ Route::prefix('v1')->group(function () {
         return $request->user();
     })->middleware('auth:sanctum');
 });
+
+Route::prefix('v1')
+    ->middleware(['auth:sanctum', 'tenant'])
+    ->group(function () {
+        foreach (glob(app_path('Modules/*/routes.php')) ?: [] as $file) {
+            require $file;
+        }
+    });
