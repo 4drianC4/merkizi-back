@@ -11,6 +11,9 @@ if [ "${1:-}" = "web" ]; then
     fi
 
     php artisan config:cache --no-interaction
+    if [ "${RUN_MIGRATIONS:-false}" = "true" ]; then
+        php artisan migrate --force --no-interaction
+    fi
     php artisan route:cache --no-interaction
     php artisan view:cache --no-interaction
     envsubst '${PORT}' < docker/nginx/production.conf.template > /tmp/nginx.conf
