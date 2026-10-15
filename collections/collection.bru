@@ -1,0 +1,57 @@
+headers {
+  Accept: application/json
+}
+
+vars:pre-request {
+  URLBase: http://localhost:8080
+  authentification: 
+  email: test@example.com
+  password: password
+  branchId: 00000000-0000-4000-8000-000000000000
+  categoryId: 00000000-0000-4000-8000-000000000000
+  productId: 00000000-0000-4000-8000-000000000000
+  employeeId: 00000000-0000-4000-8000-000000000000
+  cashRegisterId: 00000000-0000-4000-8000-000000000000
+  cashSessionId: 00000000-0000-4000-8000-000000000000
+  orderId: 00000000-0000-4000-8000-000000000000
+  storagePath: ejemplo.txt
+  storageExpires: 
+  storageSignature: 
+}
+
+script:pre-request {
+  const baseUrl = bru.getVar("URLBase") ?? bru.getEnvVar("URLBase") ?? bru.getCollectionVar("URLBase");
+  const token = bru.getVar("authentification") ?? bru.getEnvVar("authentification") ?? bru.getCollectionVar("authentification");
+  if (typeof baseUrl !== "string" || !/^https?:\/\/[^\s/]+/.test(baseUrl)) {
+    throw new Error("Configura URLBase con una URL http:// o https:// válida en las variables de la colección o del entorno.");
+  }
+  const url = req.getUrl();
+  const sessionEndpoint = /\/api\/v1\/(login|logout)(?:\?|$)/.test(url);
+  const protectedEndpoint = url.includes("/api/v1/") && !/\/login(?:\?|$)/.test(url);
+  
+  if (token && protectedEndpoint && !sessionEndpoint) {
+    req.setHeader("Authorization", "Bearer " + token);
+  } else {
+    req.setHeader("Origin", baseUrl);
+    req.setHeader("Referer", baseUrl + "/");
+    const cookie = await bru.cookies.jar().getCookie(baseUrl, "XSRF-TOKEN");
+    if (cookie) {
+      req.setHeader("X-XSRF-TOKEN", decodeURIComponent(cookie.value));
+    }
+  }
+}
+
+docs {
+  Configura URLBase, email y password en las variables de la colección o en un entorno local.
+  Para iniciar sesión ejecuta Autenticacion / GET sanctum.csrf-cookie y después POST login.
+  Mantén habilitados el almacenamiento y el envío de cookies en Bruno.
+  El login devuelve el usuario, no un token Bearer. authentification es opcional y permite usar
+  un token Sanctum existente, sin el prefijo Bearer, en las rutas protegidas salvo logout.
+  El logout requiere la sesión creada por login.
+  URLBase debe coincidir con un dominio stateful configurado en Sanctum para el flujo de sesión.
+  Ajusta las variables de IDs con los UUID devueltos al crear o listar registros existentes y accesibles por el usuario autenticado.
+  Los cuerpos JSON son ejemplos editables; no se crean registros automáticamente.
+  Las rutas GET también admiten HEAD. Se incluyen PUT y PATCH por separado.
+  Sistema incluye inicio, salud, logs internos de Boost y almacenamiento con firmas temporales.
+  Las firmas de lectura y subida son distintas: configura la correspondiente antes de cada solicitud.
+}

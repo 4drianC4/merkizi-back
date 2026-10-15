@@ -4,6 +4,7 @@ namespace App\Modules\Sales\Models;
 
 use App\Modules\Catalog\Models\Product;
 use Database\Factories\Modules\Sales\Models\OrderItemFactory;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,6 +13,8 @@ class OrderItem extends Model
 {
     /** @use HasFactory<OrderItemFactory> */
     use HasFactory;
+
+    use HasUuids;
 
     protected $fillable = [
         'order_id',

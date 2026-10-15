@@ -18,7 +18,7 @@ class UpdateCategoryRequest extends FormRequest
     {
         return [
             'name' => ['sometimes', 'required', 'string', 'max:255'],
-            'parent_id' => ['sometimes', 'nullable', 'integer'],
+            'parent_id' => ['sometimes', 'nullable', 'uuid'],
             'status' => ['sometimes', 'required', 'string', 'in:active,inactive'],
         ];
     }

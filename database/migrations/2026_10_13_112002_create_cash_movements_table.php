@@ -9,11 +9,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('cash_movements', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('tenant_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('branch_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('cash_register_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('cash_session_id')->constrained()->cascadeOnDelete();
+            $table->uuid('id')->primary();
+            $table->foreignUuid('tenant_id')->constrained()->cascadeOnDelete();
+            $table->foreignUuid('branch_id')->constrained()->cascadeOnDelete();
+            $table->foreignUuid('cash_register_id')->constrained()->cascadeOnDelete();
+            $table->foreignUuid('cash_session_id')->constrained()->cascadeOnDelete();
             $table->string('type');
             $table->decimal('amount', 12, 2);
             $table->string('reason')->nullable();

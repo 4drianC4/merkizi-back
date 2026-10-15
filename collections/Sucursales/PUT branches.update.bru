@@ -1,0 +1,22 @@
+meta {
+  name: PUT branches.update
+  type: http
+  seq: 15
+}
+
+put {
+  url: {{URLBase}}/api/v1/branches/{{branchId}}
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Sucursal principal",
+    "status": "active"
+  }
+}

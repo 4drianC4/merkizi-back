@@ -18,12 +18,12 @@ class StoreOrderRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'cash_session_id' => ['required', 'integer'],
+            'cash_session_id' => ['required', 'uuid'],
             'customer_name' => ['nullable', 'string', 'max:255'],
             'discount' => ['nullable', 'decimal:0,2'],
             'tax' => ['nullable', 'decimal:0,2'],
             'items' => ['required', 'array', 'min:1'],
-            'items.*.product_id' => ['required', 'integer'],
+            'items.*.product_id' => ['required', 'uuid'],
             'items.*.quantity' => ['required', 'decimal:0,3', 'gt:0'],
             'items.*.extras' => ['nullable', 'array'],
         ];

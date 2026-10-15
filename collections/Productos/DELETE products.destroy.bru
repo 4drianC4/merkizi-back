@@ -1,0 +1,11 @@
+meta {
+  name: DELETE products.destroy
+  type: http
+  seq: 51
+}
+
+delete {
+  url: {{URLBase}}/api/v1/products/{{productId}}
+  body: none
+  auth: none
+}

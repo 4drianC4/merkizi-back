@@ -10,11 +10,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('cash_sessions', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('tenant_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('branch_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('cash_register_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('opened_by')->constrained('users')->cascadeOnDelete();
+            $table->uuid('id')->primary();
+            $table->foreignUuid('tenant_id')->constrained()->cascadeOnDelete();
+            $table->foreignUuid('branch_id')->constrained()->cascadeOnDelete();
+            $table->foreignUuid('cash_register_id')->constrained()->cascadeOnDelete();
+            $table->foreignUuid('opened_by')->constrained('users')->cascadeOnDelete();
             $table->dateTime('opened_at');
             $table->dateTime('closed_at')->nullable();
             $table->decimal('opening_balance', 12, 2)->default(0);

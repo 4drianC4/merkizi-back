@@ -1,0 +1,11 @@
+meta {
+  name: GET cash-registers.show
+  type: http
+  seq: 20
+}
+
+get {
+  url: {{URLBase}}/api/v1/cash-registers/{{cashRegisterId}}
+  body: none
+  auth: none
+}

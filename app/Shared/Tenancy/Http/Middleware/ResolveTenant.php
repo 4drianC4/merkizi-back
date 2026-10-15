@@ -2,6 +2,7 @@
 
 namespace App\Shared\Tenancy\Http\Middleware;
 
+use App\Shared\Exceptions\DomainException;
 use App\Shared\Tenancy\Resolvers\TenantResolver;
 use App\Shared\Tenancy\TenantContext;
 use Closure;
@@ -23,6 +24,10 @@ class ResolveTenant
         $this->context->setTenant($this->resolver->resolve($request));
 
         try {
+            if ($this->context->tenant() === null) {
+                throw new DomainException('No active company membership. Contact your administrator.', 'tenant_required', 403);
+            }
+
             return $next($request);
         } finally {
             $this->context->setTenant(null);

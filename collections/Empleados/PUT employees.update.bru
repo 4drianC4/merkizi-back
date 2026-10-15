@@ -1,0 +1,25 @@
+meta {
+  name: PUT employees.update
+  type: http
+  seq: 37
+}
+
+put {
+  url: {{URLBase}}/api/v1/employees/{{employeeId}}
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Empleado de prueba",
+    "branch_id": "{{branchId}}",
+    "user_id": null,
+    "role": "employee",
+    "status": "active"
+  }
+}

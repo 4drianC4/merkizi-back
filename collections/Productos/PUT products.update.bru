@@ -1,0 +1,25 @@
+meta {
+  name: PUT products.update
+  type: http
+  seq: 49
+}
+
+put {
+  url: {{URLBase}}/api/v1/products/{{productId}}
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Cafe",
+    "sku": "CAFE-001",
+    "category_id": "{{categoryId}}",
+    "price": "15.00",
+    "status": "active"
+  }
+}

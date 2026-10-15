@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 class CreateOrder
 {
     /**
-     * @param  array{items: array<int, array{product_id: int, quantity: string, extras?: array<string, mixed>|null}>, customer_name?: string|null, discount?: string|null, tax?: string|null}  $data
+     * @param  array{items: array<int, array{product_id: string, quantity: string, extras?: array<string, mixed>|null}>, customer_name?: string|null, discount?: string|null, tax?: string|null}  $data
      */
     public function handle(Branch $branch, CashSession $session, array $data): Order
     {
@@ -22,13 +22,13 @@ class CreateOrder
             throw new InvalidStateTransitionException('The cash session is not open.');
         }
 
-        if ((int) $session->branch_id !== (int) $branch->id) {
+        if ($session->branch_id !== $branch->id) {
             throw new DomainException('The cash session does not belong to the branch.', 'session_branch_mismatch');
         }
 
         return DB::transaction(function () use ($branch, $session, $data) {
             $productIds = array_map(
-                fn (array $line): int => (int) $line['product_id'],
+                fn (array $line): string => $line['product_id'],
                 $data['items']
             );
 
@@ -38,7 +38,7 @@ class CreateOrder
             $subtotal = '0.00';
 
             foreach ($data['items'] as $line) {
-                $product = $products->get((int) $line['product_id']);
+                $product = $products->get($line['product_id']);
 
                 if ($product === null) {
                     throw new DomainException('Product not found.', 'product_not_found');

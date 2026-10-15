@@ -19,8 +19,8 @@ class StoreEmployeeRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'branch_id' => ['nullable', 'integer'],
-            'user_id' => ['nullable', 'integer'],
+            'branch_id' => ['nullable', 'uuid'],
+            'user_id' => ['nullable', 'uuid'],
             'role' => ['sometimes', 'string', 'in:employee,admin'],
         ];
     }

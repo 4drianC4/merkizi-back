@@ -3,6 +3,7 @@
 namespace App\Shared\Tenancy\Models;
 
 use Database\Factories\Shared\Tenancy\Models\PlanFactory;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -11,6 +12,8 @@ class Plan extends Model
 {
     /** @use HasFactory<PlanFactory> */
     use HasFactory;
+
+    use HasUuids;
 
     protected $fillable = [
         'name',

@@ -1,0 +1,31 @@
+meta {
+  name: POST orders.store
+  type: http
+  seq: 43
+}
+
+post {
+  url: {{URLBase}}/api/v1/orders
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "cash_session_id": "{{cashSessionId}}",
+    "customer_name": "Cliente de prueba",
+    "discount": "0.00",
+    "tax": "0.00",
+    "items": [
+      {
+        "product_id": "{{productId}}",
+        "quantity": "1.000",
+        "extras": []
+      }
+    ]
+  }
+}

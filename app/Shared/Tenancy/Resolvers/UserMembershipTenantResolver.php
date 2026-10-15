@@ -5,6 +5,7 @@ namespace App\Shared\Tenancy\Resolvers;
 use App\Shared\Identity\Models\User;
 use App\Shared\Tenancy\Models\Tenant;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 /**
  * Resolves the tenant from the authenticated user's active memberships.
@@ -26,7 +27,7 @@ class UserMembershipTenantResolver implements TenantResolver
 
         $selectedId = $request->hasSession() ? $request->session()->get('tenant_id') : null;
 
-        if ($selectedId !== null) {
+        if (is_string($selectedId) && Str::isUuid($selectedId)) {
             $membership = (clone $query)->where('tenant_id', $selectedId)->first();
 
             if ($membership !== null) {

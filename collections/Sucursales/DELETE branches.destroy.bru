@@ -1,0 +1,11 @@
+meta {
+  name: DELETE branches.destroy
+  type: http
+  seq: 17
+}
+
+delete {
+  url: {{URLBase}}/api/v1/branches/{{branchId}}
+  body: none
+  auth: none
+}

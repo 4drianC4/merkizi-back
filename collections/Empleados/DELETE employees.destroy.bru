@@ -1,0 +1,11 @@
+meta {
+  name: DELETE employees.destroy
+  type: http
+  seq: 39
+}
+
+delete {
+  url: {{URLBase}}/api/v1/employees/{{employeeId}}
+  body: none
+  auth: none
+}

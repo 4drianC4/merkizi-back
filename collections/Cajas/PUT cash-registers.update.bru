@@ -1,0 +1,22 @@
+meta {
+  name: PUT cash-registers.update
+  type: http
+  seq: 21
+}
+
+put {
+  url: {{URLBase}}/api/v1/cash-registers/{{cashRegisterId}}
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Caja principal",
+    "status": "active"
+  }
+}

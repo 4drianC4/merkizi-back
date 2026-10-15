@@ -1,0 +1,23 @@
+meta {
+  name: PUT categories.update
+  type: http
+  seq: 31
+}
+
+put {
+  url: {{URLBase}}/api/v1/categories/{{categoryId}}
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Bebidas",
+    "parent_id": null,
+    "status": "active"
+  }
+}

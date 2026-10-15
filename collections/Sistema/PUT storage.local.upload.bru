@@ -1,0 +1,23 @@
+meta {
+  name: PUT storage.local.upload
+  type: http
+  seq: 82
+}
+
+put {
+  url: {{URLBase}}/storage/{{storagePath}}?expires={{storageExpires}}&signature={{storageSignature}}
+  body: text
+  auth: none
+}
+
+headers {
+  Content-Type: text/plain
+}
+
+body:text {
+  Archivo de prueba
+}
+
+docs {
+  Requiere una URL temporal de subida válida. Usa su ruta, expiración y firma; sustituye el contenido de ejemplo.
+}

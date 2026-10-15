@@ -1,0 +1,11 @@
+meta {
+  name: DELETE categories.destroy
+  type: http
+  seq: 33
+}
+
+delete {
+  url: {{URLBase}}/api/v1/categories/{{categoryId}}
+  body: none
+  auth: none
+}

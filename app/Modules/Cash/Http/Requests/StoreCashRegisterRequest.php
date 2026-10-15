@@ -19,7 +19,7 @@ class StoreCashRegisterRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'branch_id' => ['required', 'integer'],
+            'branch_id' => ['required', 'uuid'],
         ];
     }
 }

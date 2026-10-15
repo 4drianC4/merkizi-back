@@ -1,0 +1,25 @@
+meta {
+  name: POST boost.browser-logs
+  type: http
+  seq: 80
+}
+
+post {
+  url: {{URLBase}}/_boost/browser-logs
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "logs": []
+  }
+}
+
+docs {
+  Ruta interna de desarrollo de Laravel Boost.
+}

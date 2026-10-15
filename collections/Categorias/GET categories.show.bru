@@ -1,0 +1,11 @@
+meta {
+  name: GET categories.show
+  type: http
+  seq: 30
+}
+
+get {
+  url: {{URLBase}}/api/v1/categories/{{categoryId}}
+  body: none
+  auth: none
+}

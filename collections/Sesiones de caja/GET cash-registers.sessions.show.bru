@@ -1,0 +1,11 @@
+meta {
+  name: GET cash-registers.sessions.show
+  type: http
+  seq: 26
+}
+
+get {
+  url: {{URLBase}}/api/v1/cash-registers/{{cashRegisterId}}/sessions/{{cashSessionId}}
+  body: none
+  auth: none
+}

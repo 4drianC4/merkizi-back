@@ -1,0 +1,11 @@
+meta {
+  name: GET branches.show
+  type: http
+  seq: 14
+}
+
+get {
+  url: {{URLBase}}/api/v1/branches/{{branchId}}
+  body: none
+  auth: none
+}

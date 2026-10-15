@@ -1,0 +1,11 @@
+meta {
+  name: DELETE cash-registers.destroy
+  type: http
+  seq: 23
+}
+
+delete {
+  url: {{URLBase}}/api/v1/cash-registers/{{cashRegisterId}}
+  body: none
+  auth: none
+}

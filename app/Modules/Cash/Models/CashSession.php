@@ -6,6 +6,7 @@ use App\Shared\Identity\Models\User;
 use App\Shared\Tenancy\Concerns\HasTenantScope;
 use App\Shared\Tenancy\Models\Branch;
 use Database\Factories\Modules\Cash\Models\CashSessionFactory;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -17,6 +18,7 @@ class CashSession extends Model
     use HasFactory;
 
     use HasTenantScope;
+    use HasUuids;
 
     protected $fillable = [
         'tenant_id',

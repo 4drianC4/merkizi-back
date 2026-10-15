@@ -12,7 +12,7 @@ class TenantContext
 {
     private ?Tenant $tenant = null;
 
-    private ?int $tenantId = null;
+    private ?string $tenantId = null;
 
     /**
      * Set the tenant that subsequent queries should be scoped to.
@@ -28,7 +28,7 @@ class TenantContext
         return $this->tenant;
     }
 
-    public function id(): ?int
+    public function id(): ?string
     {
         return $this->tenantId;
     }

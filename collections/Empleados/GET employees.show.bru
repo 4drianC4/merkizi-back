@@ -1,0 +1,11 @@
+meta {
+  name: GET employees.show
+  type: http
+  seq: 36
+}
+
+get {
+  url: {{URLBase}}/api/v1/employees/{{employeeId}}
+  body: none
+  auth: none
+}

@@ -18,8 +18,8 @@ class UpdateEmployeeRequest extends FormRequest
     {
         return [
             'name' => ['sometimes', 'required', 'string', 'max:255'],
-            'branch_id' => ['sometimes', 'nullable', 'integer'],
-            'user_id' => ['sometimes', 'nullable', 'integer'],
+            'branch_id' => ['sometimes', 'nullable', 'uuid'],
+            'user_id' => ['sometimes', 'nullable', 'uuid'],
             'role' => ['sometimes', 'string', 'in:employee,admin'],
             'status' => ['sometimes', 'required', 'string', 'in:active,inactive'],
         ];

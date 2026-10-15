@@ -1,0 +1,15 @@
+meta {
+  name: GET storage.local
+  type: http
+  seq: 81
+}
+
+get {
+  url: {{URLBase}}/storage/{{storagePath}}?expires={{storageExpires}}&signature={{storageSignature}}
+  body: none
+  auth: none
+}
+
+docs {
+  Usa la ruta, expiración y firma de una URL temporal de lectura generada por el servidor.
+}

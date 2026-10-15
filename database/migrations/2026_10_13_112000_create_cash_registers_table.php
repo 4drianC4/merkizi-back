@@ -9,9 +9,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('cash_registers', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('tenant_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('branch_id')->constrained()->cascadeOnDelete();
+            $table->uuid('id')->primary();
+            $table->foreignUuid('tenant_id')->constrained()->cascadeOnDelete();
+            $table->foreignUuid('branch_id')->constrained()->cascadeOnDelete();
             $table->string('name');
             $table->string('status')->default('active');
             $table->timestamps();
