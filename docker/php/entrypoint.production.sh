@@ -14,6 +14,9 @@ if [ "${1:-}" = "web" ]; then
     if [ "${RUN_MIGRATIONS:-false}" = "true" ]; then
         php artisan migrate --force --no-interaction
     fi
+    if [ "${RUN_SEEDERS:-false}" = "true" ]; then
+        php artisan db:seed --force --no-interaction
+    fi
     php artisan route:cache --no-interaction
     php artisan view:cache --no-interaction
     envsubst '${PORT}' < docker/nginx/production.conf.template > /tmp/nginx.conf
