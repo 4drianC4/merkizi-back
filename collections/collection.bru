@@ -3,7 +3,7 @@ headers {
 }
 
 vars:pre-request {
-  URLBase: http://localhost:8080
+  URLBase: https://merkizi-back.onrender.com
   authentification: 
   email: test@example.com
   password: password
@@ -55,4 +55,6 @@ docs {
   Las rutas GET también admiten HEAD. Se incluyen PUT y PATCH por separado.
   Sistema incluye inicio, salud, logs internos de Boost y almacenamiento con firmas temporales.
   Las firmas de lectura y subida son distintas: configura la correspondiente antes de cada solicitud.
+  
+  NOTA: Si se requiere probar con el servidor, colocar la variable de URLDev a URLBase "NO USAR URLDEV SOLO SU VARIABLE"
 }
