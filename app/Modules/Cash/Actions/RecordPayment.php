@@ -33,15 +33,17 @@ class RecordPayment
                 'confirmed_at' => $isPending ? null : now(),
             ]);
 
-            CashMovement::query()->create([
-                'tenant_id' => $order->tenant_id,
-                'branch_id' => $order->branch_id,
-                'cash_register_id' => $session->cash_register_id,
-                'cash_session_id' => $session->id,
-                'type' => 'sale',
-                'amount' => $amount,
-                'reference' => $reference,
-            ]);
+            if ($method === 'cash') {
+                CashMovement::query()->create([
+                    'tenant_id' => $order->tenant_id,
+                    'branch_id' => $order->branch_id,
+                    'cash_register_id' => $session->cash_register_id,
+                    'cash_session_id' => $session->id,
+                    'type' => 'sale',
+                    'amount' => $amount,
+                    'reference' => $reference,
+                ]);
+            }
 
             app(ApplyPaymentToOrder::class)->handle($order);
 
