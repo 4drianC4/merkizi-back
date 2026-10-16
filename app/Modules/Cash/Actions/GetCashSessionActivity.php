@@ -17,6 +17,7 @@ class GetCashSessionActivity
         $payments = Payment::query()
             ->whereHas('order', fn ($query) => $query->where('cash_session_id', $session->id))
             ->get(['id', 'order_id', 'method', 'amount', 'status', 'reference', 'created_at'])
+            ->toBase()
             ->map(fn (Payment $payment) => [
                 'id' => $payment->id,
                 'category' => 'payment',
@@ -34,6 +35,7 @@ class GetCashSessionActivity
             ->where('cash_session_id', $session->id)
             ->whereIn('type', ['cash_in', 'cash_out', 'expense'])
             ->get(['id', 'recorded_by', 'type', 'amount', 'reason', 'reference', 'created_at'])
+            ->toBase()
             ->map(fn (CashMovement $movement) => [
                 'id' => $movement->id,
                 'category' => 'cash_movement',
