@@ -1,0 +1,21 @@
+meta {
+  name: POST cash-sessions.reconciliation.store
+  type: http
+  seq: 27
+}
+
+post {
+  url: {{URLBase}}/api/v1/cash-sessions/{{cashSessionId}}/reconciliation
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "counted_cash_balance": "120.00"
+  }
+}

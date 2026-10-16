@@ -1,11 +1,21 @@
 meta {
   name: POST cash-sessions.close
   type: http
-  seq: 27
+  seq: 28
 }
 
 post {
   url: {{URLBase}}/api/v1/cash-sessions/{{cashSessionId}}/close
-  body: none
+  body: json
   auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "difference_note": "Diferencia identificada durante el arqueo"
+  }
 }

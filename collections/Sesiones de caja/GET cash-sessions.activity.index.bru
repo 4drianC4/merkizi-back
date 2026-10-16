@@ -1,0 +1,11 @@
+meta {
+  name: GET cash-sessions.activity.index
+  type: http
+  seq: 30
+}
+
+get {
+  url: {{URLBase}}/api/v1/cash-sessions/{{cashSessionId}}/activity
+  body: none
+  auth: none
+}
