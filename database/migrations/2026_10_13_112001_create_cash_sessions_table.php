@@ -17,10 +17,10 @@ return new class extends Migration
             $table->foreignUuid('opened_by')->constrained('users')->cascadeOnDelete();
             $table->dateTime('opened_at');
             $table->dateTime('closed_at')->nullable();
-            $table->decimal('opening_balance', 14, 2);
-            $table->decimal('expected_cash_balance', 14, 2)->nullable();
-            $table->decimal('counted_cash_balance', 14, 2)->nullable();
-            $table->decimal('cash_difference', 14, 2)->nullable();
+            $table->decimal('opening_balance', 12, 2);
+            $table->decimal('expected_cash_balance', 12, 2)->nullable();
+            $table->decimal('counted_cash_balance', 12, 2)->nullable();
+            $table->decimal('cash_difference', 12, 2)->nullable();
             $table->text('difference_note')->nullable();
             $table->string('status')->default('open');
             $table->timestamps();
