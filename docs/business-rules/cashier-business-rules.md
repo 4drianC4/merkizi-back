@@ -46,6 +46,10 @@ Los movimientos manuales permitidos son:
 
 El usuario siempre ingresa un monto positivo. El backend define el signo según el tipo y exige un concepto; el comprobante es opcional.
 
+`reason` explica el motivo del movimiento y siempre es obligatorio. `reference` es opcional y almacena el identificador del comprobante que respalda el movimiento físico, por ejemplo el número de una factura, recibo, boleta de depósito o vale de reposición.
+
+`payments.reference` tiene un propósito distinto: identifica una operación de pago externa, como el código de una transacción QR, tarjeta o transferencia. No se deben duplicar referencias entre un pago en efectivo y su movimiento automático `sale`, pues ambos ya quedan vinculados a la misma venta.
+
 ## Efectivo esperado
 
 El sistema calcula el efectivo esperado con la siguiente fórmula:
@@ -127,3 +131,5 @@ La consulta normal mantiene la información en tiempo real. Una vista materializ
 - Agregar un flujo excepcional para finalizar sin arqueo.
 - Evaluar guardar quién cerró la sesión (`closed_by`), que puede ser diferente de quien la abrió.
 - Evaluar un conteo por denominación de billetes y monedas.
+- Evaluar registrar quién realizó cada pago para mostrarlo en la actividad de sesión.
+- Agregar paginación a la actividad de sesión si el historial puede crecer lo suficiente para requerirla.
