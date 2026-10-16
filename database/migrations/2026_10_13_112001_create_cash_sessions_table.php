@@ -17,8 +17,11 @@ return new class extends Migration
             $table->foreignUuid('opened_by')->constrained('users')->cascadeOnDelete();
             $table->dateTime('opened_at');
             $table->dateTime('closed_at')->nullable();
-            $table->decimal('opening_balance', 12, 2)->default(0);
-            $table->decimal('closing_balance', 12, 2)->nullable();
+            $table->decimal('opening_balance', 14, 2);
+            $table->decimal('expected_cash_balance', 14, 2)->nullable();
+            $table->decimal('counted_cash_balance', 14, 2)->nullable();
+            $table->decimal('cash_difference', 14, 2)->nullable();
+            $table->text('difference_note')->nullable();
             $table->string('status')->default('open');
             $table->timestamps();
 
@@ -27,7 +30,7 @@ return new class extends Migration
             $table->index('cash_register_id');
         });
 
-        DB::statement('CREATE UNIQUE INDEX cash_sessions_register_open_unique ON cash_sessions (cash_register_id) WHERE status = \'open\'');
+        DB::statement("CREATE UNIQUE INDEX cash_sessions_register_active_unique ON cash_sessions (cash_register_id) WHERE status IN ('open', 'reconciliation_pending')");
     }
 
     public function down(): void

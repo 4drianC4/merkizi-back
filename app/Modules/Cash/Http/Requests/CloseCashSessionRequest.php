@@ -16,6 +16,8 @@ class CloseCashSessionRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [];
+        return [
+            'difference_note' => ['nullable', 'string', 'max:1000'],
+        ];
     }
 }

@@ -28,7 +28,10 @@ class CashSession extends Model
         'opened_at',
         'closed_at',
         'opening_balance',
-        'closing_balance',
+        'expected_cash_balance',
+        'counted_cash_balance',
+        'cash_difference',
+        'difference_note',
         'status',
     ];
 
@@ -41,7 +44,9 @@ class CashSession extends Model
             'opened_at' => 'datetime',
             'closed_at' => 'datetime',
             'opening_balance' => 'decimal:2',
-            'closing_balance' => 'decimal:2',
+            'expected_cash_balance' => 'decimal:2',
+            'counted_cash_balance' => 'decimal:2',
+            'cash_difference' => 'decimal:2',
         ];
     }
 

@@ -6,31 +6,35 @@ use App\Modules\Cash\Models\CashSession;
 use App\Shared\Exceptions\InvalidStateTransitionException;
 use App\Shared\Support\Money;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class CloseCashSession
 {
-    public function handle(CashSession $session): CashSession
+    public function handle(CashSession $session, ?string $differenceNote = null): CashSession
     {
-        return DB::transaction(function () use ($session) {
-            $session->lockForUpdate();
+        return DB::transaction(function () use ($session, $differenceNote) {
+            $session = CashSession::query()
+                ->whereKey($session->getKey())
+                ->lockForUpdate()
+                ->firstOrFail();
 
-            if ($session->status !== 'open') {
-                throw new InvalidStateTransitionException('The cash session is already closed.');
+            if ($session->status !== 'reconciliation_pending') {
+                throw new InvalidStateTransitionException('The cash session is not pending reconciliation.');
             }
 
-            $movementsTotal = '0.00';
-
-            foreach ($session->movements as $movement) {
-                $movementsTotal = Money::add($movementsTotal, (string) $movement->amount);
+            if (Money::cmp((string) $session->cash_difference, '0.00') !== 0 && blank($differenceNote)) {
+                throw ValidationException::withMessages([
+                    'difference_note' => 'A note is required when the counted cash differs from the expected cash.',
+                ]);
             }
 
             $session->update([
                 'status' => 'closed',
                 'closed_at' => now(),
-                'closing_balance' => Money::add((string) $session->opening_balance, $movementsTotal),
+                'difference_note' => $differenceNote,
             ]);
 
-            return $session;
+            return $session->refresh();
         });
     }
 }
