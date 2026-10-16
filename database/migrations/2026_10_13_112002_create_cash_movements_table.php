@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignUuid('cash_session_id')->constrained()->cascadeOnDelete();
             $table->foreignUuid('recorded_by')->constrained('users')->cascadeOnDelete();
             $table->string('type');
-            $table->decimal('amount', 14, 2);
+            $table->decimal('amount', 12, 2);
             $table->text('reason');
             $table->string('reference', 50)->nullable();
             $table->timestamps();
