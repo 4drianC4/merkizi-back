@@ -2,6 +2,7 @@
 
 namespace App\Modules\Cash\Models;
 
+use App\Shared\Identity\Models\User;
 use App\Shared\Tenancy\Concerns\HasTenantScope;
 use Database\Factories\Modules\Cash\Models\CashMovementFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -22,6 +23,7 @@ class CashMovement extends Model
         'branch_id',
         'cash_register_id',
         'cash_session_id',
+        'recorded_by',
         'type',
         'amount',
         'reason',
@@ -44,5 +46,13 @@ class CashMovement extends Model
     public function session(): BelongsTo
     {
         return $this->belongsTo(CashSession::class, 'cash_session_id');
+    }
+
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function recordedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'recorded_by');
     }
 }

@@ -5,6 +5,7 @@ namespace Database\Factories\Modules\Cash\Models;
 use App\Modules\Cash\Models\CashMovement;
 use App\Modules\Cash\Models\CashRegister;
 use App\Modules\Cash\Models\CashSession;
+use App\Shared\Identity\Models\User;
 use App\Shared\Tenancy\Models\Branch;
 use App\Shared\Tenancy\Models\Tenant;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -23,9 +24,10 @@ class CashMovementFactory extends Factory
             'branch_id' => Branch::factory(),
             'cash_register_id' => CashRegister::factory(),
             'cash_session_id' => CashSession::factory(),
+            'recorded_by' => User::factory(),
             'type' => 'sale',
             'amount' => number_format(fake()->randomFloat(2, -100, 100), 2, '.', ''),
-            'reason' => null,
+            'reason' => 'Cash payment',
             'reference' => null,
         ];
     }

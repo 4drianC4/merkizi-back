@@ -7,13 +7,14 @@ use App\Modules\Cash\Models\Payment;
 use App\Modules\Sales\Actions\ApplyPaymentToOrder;
 use App\Modules\Sales\Models\Order;
 use App\Shared\Exceptions\InvalidStateTransitionException;
+use App\Shared\Identity\Models\User;
 use Illuminate\Support\Facades\DB;
 
 class RecordPayment
 {
-    public function handle(Order $order, string $method, string $amount, ?string $reference = null): Payment
+    public function handle(Order $order, User $user, string $method, string $amount, ?string $reference = null): Payment
     {
-        return DB::transaction(function () use ($order, $method, $amount, $reference) {
+        return DB::transaction(function () use ($order, $user, $method, $amount, $reference) {
             $session = $order->session;
 
             if ($session === null || $session->status !== 'open') {
@@ -39,8 +40,10 @@ class RecordPayment
                     'branch_id' => $order->branch_id,
                     'cash_register_id' => $session->cash_register_id,
                     'cash_session_id' => $session->id,
+                    'recorded_by' => $user->id,
                     'type' => 'sale',
                     'amount' => $amount,
+                    'reason' => 'Cash payment',
                     'reference' => $reference,
                 ]);
             }

@@ -15,6 +15,7 @@ class PaymentController extends Controller
     {
         $payment = $recordPayment->handle(
             $order,
+            $request->user(),
             $request->validated('method'),
             (string) $request->validated('amount'),
             $request->validated('reference'),

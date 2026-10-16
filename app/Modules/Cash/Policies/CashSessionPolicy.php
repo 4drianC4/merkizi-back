@@ -24,4 +24,9 @@ class CashSessionPolicy
     {
         return $this->isMember($user, $cashSession->tenant);
     }
+
+    public function recordMovement(User $user, CashSession $cashSession): bool
+    {
+        return $this->isMember($user, $cashSession->tenant);
+    }
 }
