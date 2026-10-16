@@ -49,5 +49,7 @@ class DatabaseSeeder extends Seeder
                 );
             });
         });
+
+        $this->call(CashDemoSeeder::class);
     }
 }
