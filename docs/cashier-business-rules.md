@@ -7,7 +7,8 @@ Este documento registra las decisiones actuales para el manejo de efectivo físi
 Una sesión de caja representa el efectivo manejado en una caja física durante un turno o periodo de operación.
 
 - Una caja solo puede tener una sesión activa a la vez: `open` o `reconciliation_pending`.
-- La sesión comienza con un fondo inicial (`opening_balance`).
+- Solo una caja con estado `active` puede abrir una sesión.
+- La sesión comienza con un fondo inicial (`opening_balance`), este puede comenzar en 0 actualmente.
 - La sesión se cierra con arqueo físico; por ahora no se implementará el flujo de finalizar sin arqueo.
 
 ## Pagos y efectivo físico

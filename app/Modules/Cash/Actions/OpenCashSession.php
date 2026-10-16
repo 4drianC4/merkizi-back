@@ -13,13 +13,22 @@ class OpenCashSession
     public function handle(CashRegister $register, User $user, string $openingBalance): CashSession
     {
         return DB::transaction(function () use ($register, $user, $openingBalance) {
+            $register = CashRegister::query()
+                ->whereKey($register->getKey())
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if ($register->status !== 'active') {
+                throw new InvalidStateTransitionException('The cash register is inactive.');
+            }
+
             $existing = $register->sessions()
-                ->where('status', 'open')
+                ->whereIn('status', ['open', 'reconciliation_pending'])
                 ->lockForUpdate()
                 ->first();
 
             if ($existing !== null) {
-                throw new InvalidStateTransitionException('The cash register already has an open session.');
+                throw new InvalidStateTransitionException('The cash register already has an active session.');
             }
 
             $session = CashSession::query()->create([
