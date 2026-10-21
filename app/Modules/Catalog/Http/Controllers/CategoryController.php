@@ -21,7 +21,7 @@ class CategoryController extends Controller
     {
         $this->authorize('viewAny', Category::class);
 
-        return CategoryResource::collection(Category::query()->latest()->get());
+        return CategoryResource::collection(Category::query()->with('children')->orderBy('name')->orderBy('id')->get());
     }
 
     public function store(StoreCategoryRequest $request): JsonResponse

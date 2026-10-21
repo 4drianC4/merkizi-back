@@ -21,3 +21,9 @@ body:json {
     "reference": null
   }
 }
+
+docs {
+  Compatibilidad: solo pedidos independientes creados sin account_id.
+  Para pedidos de mesa o para llevar asociados a cuenta, usar Ventas / POST accounts.payments.store.
+  Los pedidos de cuenta rechazan esta ruta con 409 para no eludir pagos mixtos, saldo e idempotencia.
+}

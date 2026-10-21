@@ -1,0 +1,17 @@
+meta {
+  name: GET sales.history
+  type: http
+  seq: 86
+}
+
+get {
+  url: {{URLBase}}/api/v1/sales/history?branch_id={{branchId}}&per_page=20&page=1&sort=created_at&direction=desc
+  body: none
+  auth: none
+}
+
+docs {
+  Permiso: pos.venta.historial. Autenticación Sanctum y cuenta activa.
+  Historial de ventas finalizadas, no de cuentas abiertas. Filtros: q (número exacto o cliente/NIT parcial), from/to YYYY-MM-DD en America/La_Paz, status=completed|partially_refunded|refunded, service_type=table|takeaway, cashier_id, method=cash|qr|card|transfer, branch_id. sort=created_at|number|total; direction=asc|desc; per_page 1..100. 200 data[], links, meta de paginación y filters.
+  IDs son UUID. La empresa procede del usuario autenticado; nunca enviar tenant_id.
+}

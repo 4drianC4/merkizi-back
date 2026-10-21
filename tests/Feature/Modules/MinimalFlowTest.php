@@ -8,7 +8,6 @@ use App\Shared\Tenancy\Models\Plan;
 use App\Shared\Tenancy\Models\PlanLimit;
 use App\Shared\Tenancy\Models\Subscription;
 use App\Shared\Tenancy\Models\Tenant;
-use App\Shared\Tenancy\Models\TenantMembership;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
@@ -34,15 +33,11 @@ class MinimalFlowTest extends TestCase
         PlanLimit::factory()->create(['plan_id' => $plan->id, 'key' => 'max_cash_registers_per_branch', 'value' => 5]);
         Subscription::factory()->create(['tenant_id' => $this->tenant->id, 'plan_id' => $plan->id, 'status' => 'active']);
 
-        $this->admin = User::factory()->create();
-        TenantMembership::factory()->create([
-            'tenant_id' => $this->tenant->id,
-            'user_id' => $this->admin->id,
-            'role' => 'admin',
-            'status' => 'active',
-        ]);
+        $this->admin = User::factory()->admin()->create(['tenant_id' => $this->tenant->id]);
 
         $this->branch = Branch::factory()->create(['tenant_id' => $this->tenant->id, 'status' => 'active']);
+
+        $this->admin->branches()->attach($this->branch->id, ['tenant_id' => $this->tenant->id, 'is_primary' => true]);
 
         Sanctum::actingAs($this->admin);
     }

@@ -3,6 +3,7 @@
 namespace App\Modules\Cash\Actions;
 
 use App\Modules\Cash\Models\CashMovement;
+use App\Modules\Cash\Models\CashSession;
 use App\Modules\Cash\Models\Payment;
 use App\Modules\Sales\Actions\ApplyPaymentToOrder;
 use App\Modules\Sales\Models\Order;
@@ -14,7 +15,11 @@ class RecordPayment
     public function handle(Order $order, string $method, string $amount, ?string $reference = null): Payment
     {
         return DB::transaction(function () use ($order, $method, $amount, $reference) {
-            $session = $order->session;
+            $order = Order::query()->lockForUpdate()->findOrFail($order->id);
+            if ($order->account_id !== null) {
+                throw new InvalidStateTransitionException('Use the account payments endpoint for this order.');
+            }
+            $session = CashSession::query()->lockForUpdate()->find($order->cash_session_id);
 
             if ($session === null || $session->status !== 'open') {
                 throw new InvalidStateTransitionException('The order has no open cash session.');
@@ -33,15 +38,17 @@ class RecordPayment
                 'confirmed_at' => $isPending ? null : now(),
             ]);
 
-            CashMovement::query()->create([
-                'tenant_id' => $order->tenant_id,
-                'branch_id' => $order->branch_id,
-                'cash_register_id' => $session->cash_register_id,
-                'cash_session_id' => $session->id,
-                'type' => 'sale',
-                'amount' => $amount,
-                'reference' => $reference,
-            ]);
+            if ($method === 'cash') {
+                CashMovement::query()->create([
+                    'tenant_id' => $order->tenant_id,
+                    'branch_id' => $order->branch_id,
+                    'cash_register_id' => $session->cash_register_id,
+                    'cash_session_id' => $session->id,
+                    'type' => 'sale',
+                    'amount' => $amount,
+                    'reference' => $reference,
+                ]);
+            }
 
             app(ApplyPaymentToOrder::class)->handle($order);
 

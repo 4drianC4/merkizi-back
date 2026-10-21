@@ -1,0 +1,17 @@
+meta {
+  name: GET sales.audit
+  type: http
+  seq: 89
+}
+
+get {
+  url: {{URLBase}}/api/v1/sales/{{saleId}}/audit
+  body: none
+  auth: none
+}
+
+docs {
+  Permiso: pos.venta.auditoria. Autenticación Sanctum y cuenta activa.
+  200 data[] paginado: trazabilidad de la cuenta que originó la venta. Las uniones/transferencias registran origen, destino, ítems/importes y operador en ambas cuentas.
+  IDs son UUID. La empresa procede del usuario autenticado; nunca enviar tenant_id.
+}

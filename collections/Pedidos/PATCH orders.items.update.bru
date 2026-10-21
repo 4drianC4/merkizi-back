@@ -1,0 +1,34 @@
+meta {
+  name: PATCH orders.items.update
+  type: http
+  seq: 79
+}
+
+patch {
+  url: {{URLBase}}/api/v1/orders/{{orderId}}/items
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "version": {{orderVersion}},
+    "items": [
+      {
+        "id": "{{orderItemId}}",
+        "quantity": "2.000",
+        "notes": "Actualizar cantidad"
+      }
+    ]
+  }
+}
+
+docs {
+  Permiso: pos.venta.editar. Autenticación Sanctum y cuenta activa.
+  Reemplaza la lista completa de ítems de un pedido de cuenta. Con id: solo cantidad y notas, conserva precio histórico. Sin id: product_id, quantity, variant_id, extras y notes para una línea nueva. Omitir una línea la quita; items=[] vacía el pedido. version debe ser la última recibida; 409 version_conflict requiere recargar. No permite bajar el total por debajo de pagos confirmados+pendientes. 200 data con nueva version.
+  IDs son UUID. La empresa procede del usuario autenticado; nunca enviar tenant_id.
+}

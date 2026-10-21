@@ -28,6 +28,7 @@ class BranchController extends Controller
     public function store(StoreBranchRequest $request, CreateBranch $createBranch): JsonResponse
     {
         $branch = $createBranch->handle($this->tenant(), $request->validated('name'));
+        $request->user()->branches()->syncWithoutDetaching([$branch->id => ['tenant_id' => $this->tenant()->id, 'is_primary' => false]]);
 
         return (new BranchResource($branch))->response()->setStatusCode(201);
     }

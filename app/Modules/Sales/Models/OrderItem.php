@@ -17,6 +17,7 @@ class OrderItem extends Model
     use HasUuids;
 
     protected $fillable = [
+        'notes', 'variant_id',
         'order_id',
         'product_id',
         'name',

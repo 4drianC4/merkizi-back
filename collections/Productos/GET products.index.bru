@@ -9,3 +9,10 @@ get {
   body: none
   auth: none
 }
+
+docs {
+  Permiso: catalogo.productos.ver. Filtros: branch_id (sucursal asignada), category_id, q y available=true.
+  200 data[] con precio base, effective_price por sucursal, available, variantes y extras autorizados.
+  available representa producto activo; no garantiza stock físico: el inventario todavía no está integrado.
+  Los precios definitivos al pedir provienen del servidor, nunca del JSON del cliente.
+}

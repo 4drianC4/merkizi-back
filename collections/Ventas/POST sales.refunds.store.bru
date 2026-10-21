@@ -1,0 +1,30 @@
+meta {
+  name: POST sales.refunds.store
+  type: http
+  seq: 90
+}
+
+post {
+  url: {{URLBase}}/api/v1/sales/{{saleId}}/refunds
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  Idempotency-Key: {{idempotencyKey}}
+}
+
+body:json {
+  {
+    "cash_session_id": "{{cashSessionId}}",
+    "amount": "5.00",
+    "reason": "Devolución acordada con el cliente"
+  }
+}
+
+docs {
+  Permiso: pos.venta.devolver. Autenticación Sanctum y cuenta activa.
+  Devolución monetaria operativa EN EFECTIVO, sin borrar la venta original. Exige motivo y caja abierta de la misma sucursal; máximo total original menos devoluciones previas. Idempotency-Key obligatorio. 201 data con devolución; reintento conserva ID y no duplica egreso. No representa nota de crédito fiscal ni repone inventario.
+  IDs son UUID. La empresa procede del usuario autenticado; nunca enviar tenant_id.
+}

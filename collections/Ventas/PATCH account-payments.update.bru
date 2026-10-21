@@ -1,0 +1,27 @@
+meta {
+  name: PATCH account-payments.update
+  type: http
+  seq: 82
+}
+
+patch {
+  url: {{URLBase}}/api/v1/account-payments/{{accountPaymentId}}
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "status": "confirmed"
+  }
+}
+
+docs {
+  Permiso: pos.venta.confirmar_pago. Autenticación Sanctum y cuenta activa.
+  Confirmación MANUAL auditada por operador autorizado, después de comprobar el pago externo. No es una integración ni webhook bancario. status=confirmed|rejected|expired, solo desde pending. Repetir el estado actual no duplica movimientos. 200 data. Resolver pendientes antes de cerrar la caja.
+  IDs son UUID. La empresa procede del usuario autenticado; nunca enviar tenant_id.
+}

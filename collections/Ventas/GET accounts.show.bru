@@ -1,0 +1,17 @@
+meta {
+  name: GET accounts.show
+  type: http
+  seq: 77
+}
+
+get {
+  url: {{URLBase}}/api/v1/accounts/{{accountId}}
+  body: none
+  auth: none
+}
+
+docs {
+  Permiso: pos.venta.ver. Autenticación Sanctum y cuenta activa.
+  200 data: cuenta, orders[], tables[], payments[], subtotal, discount, tax, tip, total, paid, pending y balance. Consultar antes de cobrar o transferir. balance=total-confirmados; pending reserva parte del saldo.
+  IDs son UUID. La empresa procede del usuario autenticado; nunca enviar tenant_id.
+}

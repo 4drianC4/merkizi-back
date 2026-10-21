@@ -1,7 +1,7 @@
 meta {
   name: POST orders.store
   type: http
-  seq: 43
+  seq: 78
 }
 
 post {
@@ -16,16 +16,23 @@ headers {
 
 body:json {
   {
-    "cash_session_id": "{{cashSessionId}}",
-    "customer_name": "Cliente de prueba",
+    "account_id": "{{accountId}}",
     "discount": "0.00",
     "tax": "0.00",
+    "notes": "Pedido de mesa",
     "items": [
       {
         "product_id": "{{productId}}",
         "quantity": "1.000",
-        "extras": []
+        "extras": [],
+        "notes": "Sin cebolla"
       }
     ]
   }
+}
+
+docs {
+  Permiso: pos.venta.crear. Autenticación Sanctum y cuenta activa.
+  Agrega un pedido a una cuenta abierta. 201 data: id, account_id, number correlativo por sucursal, version, ítems y totales. variant_id opcional; extras=[{product_id: UUID}]. Precios, nombres y extras se resuelven en backend. No cierra la cuenta. El flujo anterior con cash_session_id sin account_id sigue disponible como pedido independiente; no usarlo para mesa abierta.
+  IDs son UUID. La empresa procede del usuario autenticado; nunca enviar tenant_id.
 }

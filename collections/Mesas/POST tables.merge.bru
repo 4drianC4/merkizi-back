@@ -1,0 +1,30 @@
+meta {
+  name: POST tables.merge
+  type: http
+  seq: 84
+}
+
+post {
+  url: {{URLBase}}/api/v1/tables/merge
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "source_account_id": "{{sourceAccountId}}",
+    "destination_account_id": "{{destinationAccountId}}",
+    "source_version": {{sourceVersion}},
+    "destination_version": {{destinationVersion}}
+  }
+}
+
+docs {
+  Permiso: salon.mesas.unir. Autenticación Sanctum y cuenta activa.
+  Une dos cuentas abiertas de mesa en la misma sucursal. Destino permanece abierto. Fuente queda merged y apunta a destination_account_id. Se trasladan los mismos pedidos y pagos, sin copiarlos; origin_account_id del pago se conserva. Las mesas de ambas cuentas quedan ocupadas por el destino hasta su cierre. 200 data de cuenta destino. Versiones obsoletas: 409 version_conflict.
+  IDs son UUID. La empresa procede del usuario autenticado; nunca enviar tenant_id.
+}

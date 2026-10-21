@@ -25,7 +25,7 @@ class ResolveTenant
 
         try {
             if ($this->context->tenant() === null) {
-                throw new DomainException('No active company membership. Contact your administrator.', 'tenant_required', 403);
+                throw new DomainException('No active company account. Contact your administrator.', 'tenant_required', 403);
             }
 
             return $next($request);

@@ -1,0 +1,17 @@
+meta {
+  name: GET tables.index
+  type: http
+  seq: 72
+}
+
+get {
+  url: {{URLBase}}/api/v1/tables?branch_id={{branchId}}
+  body: none
+  auth: none
+}
+
+docs {
+  Permiso: salon.mesas.ver. Autenticación Sanctum y cuenta activa.
+  Filtros opcionales: branch_id, area_id y status=free|occupied|blocked. 200 data[] incluye area, capacidad, estado calculado y active_account con totales. No se envía estado ocupado desde el cliente.
+  IDs son UUID. La empresa procede del usuario autenticado; nunca enviar tenant_id.
+}

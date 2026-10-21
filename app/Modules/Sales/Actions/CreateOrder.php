@@ -3,7 +3,6 @@
 namespace App\Modules\Sales\Actions;
 
 use App\Modules\Cash\Models\CashSession;
-use App\Modules\Catalog\Models\Product;
 use App\Modules\Sales\Models\Order;
 use App\Shared\Exceptions\DomainException;
 use App\Shared\Exceptions\InvalidStateTransitionException;
@@ -13,8 +12,10 @@ use Illuminate\Support\Facades\DB;
 
 class CreateOrder
 {
+    public function __construct(private readonly BuildOrderItems $builder) {}
+
     /**
-     * @param  array{items: array<int, array{product_id: string, quantity: string, extras?: array<string, mixed>|null}>, customer_name?: string|null, discount?: string|null, tax?: string|null}  $data
+     * @param  array{items: array<int, array{product_id: string, quantity: string, variant_id?: string|null, extras?: list<array{product_id: string}>|null, notes?: string|null}>, customer_name?: string|null, discount?: string|null, tax?: string|null}  $data
      */
     public function handle(Branch $branch, CashSession $session, array $data): Order
     {
@@ -27,41 +28,17 @@ class CreateOrder
         }
 
         return DB::transaction(function () use ($branch, $session, $data) {
-            $productIds = array_map(
-                fn (array $line): string => $line['product_id'],
-                $data['items']
-            );
-
-            $products = Product::query()->whereIn('id', $productIds)->get()->keyBy('id');
-
-            $items = [];
+            $items = $this->builder->handle($branch, $data['items']);
             $subtotal = '0.00';
-
-            foreach ($data['items'] as $line) {
-                $product = $products->get($line['product_id']);
-
-                if ($product === null) {
-                    throw new DomainException('Product not found.', 'product_not_found');
-                }
-
-                $price = $product->priceForBranch($branch);
-                $quantity = (string) $line['quantity'];
-                $lineSubtotal = Money::mul($price, $quantity);
-
-                $items[] = [
-                    'product_id' => $product->id,
-                    'name' => $product->name,
-                    'price' => $price,
-                    'quantity' => $quantity,
-                    'extras' => $line['extras'] ?? null,
-                    'subtotal' => $lineSubtotal,
-                ];
-
-                $subtotal = Money::add($subtotal, $lineSubtotal);
+            foreach ($items as $item) {
+                $subtotal = Money::add($subtotal, (string) $item['subtotal']);
             }
 
             $discount = (string) ($data['discount'] ?? '0.00');
             $tax = (string) ($data['tax'] ?? '0.00');
+            if (Money::cmp($discount, $subtotal) > 0) {
+                throw new DomainException('Discount cannot exceed subtotal.', 'invalid_totals');
+            }
             $total = Money::sub(Money::add($subtotal, $tax), $discount);
 
             $order = Order::query()->create([

@@ -12,6 +12,7 @@ use App\Shared\Exceptions\DomainException;
 use App\Shared\Tenancy\Concerns\ResolvesTenant;
 use App\Shared\Tenancy\Models\Branch;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 
@@ -19,11 +20,11 @@ class CashRegisterController extends Controller
 {
     use ResolvesTenant;
 
-    public function index(): AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
         $this->authorize('viewAny', CashRegister::class);
 
-        return CashRegisterResource::collection(CashRegister::query()->latest()->get());
+        return CashRegisterResource::collection($request->user()->restrictToBranches(CashRegister::query())->latest()->get());
     }
 
     public function store(StoreCashRegisterRequest $request, CreateCashRegister $createCashRegister): JsonResponse
@@ -33,6 +34,8 @@ class CashRegisterController extends Controller
         if ($branch === null) {
             throw new DomainException('Branch not found.', 'branch_not_found');
         }
+
+        abort_unless($request->user()->hasPermission('caja.cajas.crear', $branch), 403);
 
         $cashRegister = $createCashRegister->handle($this->tenant(), $branch, $request->validated('name'));
 

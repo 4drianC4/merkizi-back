@@ -1,0 +1,17 @@
+meta {
+  name: GET account-payments.show
+  type: http
+  seq: 81
+}
+
+get {
+  url: {{URLBase}}/api/v1/account-payments/{{accountPaymentId}}
+  body: none
+  auth: none
+}
+
+docs {
+  Permiso: pos.venta.ver. Autenticación Sanctum y cuenta activa.
+  200 data: pago y estado actual, referencia, origen y cuenta actual, caja, operador, importe, recibido, cambio y fecha de confirmación.
+  IDs son UUID. La empresa procede del usuario autenticado; nunca enviar tenant_id.
+}
