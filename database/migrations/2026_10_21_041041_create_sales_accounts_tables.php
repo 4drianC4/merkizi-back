@@ -53,10 +53,16 @@ return new class extends Migration
             $table->string('status')->default('open');
             $table->decimal('tip', 14, 2)->default(0);
             $table->unsignedInteger('version')->default(1);
-            $table->foreignUuid('destination_account_id')->nullable()->constrained('table_accounts')->restrictOnDelete();
+            // Crear la columna aquí; agregar su clave foránea después de crear la tabla.
+            $table->uuid('destination_account_id')->nullable();
             $table->timestampTz('closed_at')->nullable();
             $table->timestampsTz();
             $table->index(['tenant_id', 'branch_id', 'status']);
+        });
+        // PostgreSQL necesita que la clave primaria de table_accounts ya exista.
+        Schema::table('table_accounts', function (Blueprint $table): void {
+            $table->foreign('destination_account_id')
+                ->references('id')->on('table_accounts')->restrictOnDelete();
         });
         Schema::create('account_tables', function (Blueprint $table): void {
             $table->uuid('id')->primary();
