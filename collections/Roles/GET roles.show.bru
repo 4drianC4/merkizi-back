@@ -1,0 +1,15 @@
+meta {
+  name: GET roles.show
+  type: http
+  seq: 104
+}
+
+get {
+  url: {{URLBase}}/api/v1/roles/{{roleId}}
+  body: none
+  auth: none
+}
+
+docs {
+  Requiere roles.ver. Incluye los permisos base del rol.
+}

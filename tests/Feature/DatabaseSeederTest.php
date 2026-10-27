@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Shared\Identity\Models\Permission;
 use App\Shared\Identity\Models\Role;
 use App\Shared\Identity\Models\User;
 use App\Shared\Tenancy\TenantContext;
@@ -44,6 +45,35 @@ class DatabaseSeederTest extends TestCase
         $cashier = User::query()->where('email', 'cashier@example.com')->firstOrFail();
         $this->assertTrue($cashier->hasPermission('pos.venta.cobrar'));
         $this->assertFalse($cashier->hasPermission('caja.sesiones.cerrar'));
+    }
+
+    public function test_employee_screen_permissions_are_seeded_idempotently_and_can_be_assigned_individually(): void
+    {
+        $this->seed();
+        $this->seed();
+        $admin = User::query()->where('email', 'test@example.com')->firstOrFail();
+        $employee = User::query()->where('email', 'employee@example.com')->firstOrFail();
+        $codes = ['caja.movimientos.crear', 'caja.sesiones.arquear', 'catalogo.stock.ver', 'pos.venta.descontar', 'pos.venta.anular'];
+        Sanctum::actingAs($admin);
+
+        $response = $this->getJson('/api/v1/permissions')->assertOk();
+        $overrides = [];
+        foreach ($codes as $code) {
+            $permission = Permission::query()->where('code', $code)->sole();
+            $response->assertJsonFragment(['code' => $code]);
+            $this->assertTrue($admin->hasPermission($code));
+            $this->assertFalse($employee->hasPermission($code));
+            $overrides[] = ['permission_id' => $permission->id, 'granted' => true];
+        }
+
+        $this->putJson('/api/v1/employees/'.$employee->id.'/permissions', ['permissions' => $overrides])
+            ->assertOk()->assertJsonCount(5, 'data.permissions');
+        foreach ($overrides as $override) {
+            $this->assertDatabaseHas('permission_user', [...$override, 'user_id' => $employee->id, 'granted_by_user_id' => $admin->id]);
+        }
+        foreach ($codes as $code) {
+            $this->assertTrue($employee->hasPermission($code));
+        }
     }
 
     public function test_production_seeding_does_not_create_demo_accounts(): void
