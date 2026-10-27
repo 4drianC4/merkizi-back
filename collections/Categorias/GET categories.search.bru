@@ -1,0 +1,15 @@
+meta {
+  name: GET categories.search
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{URLBase}}/api/v1/categories/search?name=beb
+  body: none
+  auth: none
+}
+
+params:query {
+  name: beb
+}

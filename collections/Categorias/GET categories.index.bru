@@ -5,7 +5,11 @@ meta {
 }
 
 get {
-  url: {{URLBase}}/api/v1/categories
+  url: {{URLBase}}/api/v1/categories?parent_id=null
   body: none
   auth: none
+}
+
+params:query {
+  parent_id: null
 }
