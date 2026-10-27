@@ -1,0 +1,15 @@
+meta {
+  name: GET raw-material-categories.index
+  type: http
+  seq: 28
+}
+
+get {
+  url: {{URLBase}}/api/v1/raw-material-categories?parent_id=null
+  body: none
+  auth: none
+}
+
+params:query {
+  parent_id: null
+}

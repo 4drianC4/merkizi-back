@@ -22,6 +22,8 @@ class CategoryResource extends JsonResource
             'status' => $this->status,
             'parent_id' => $this->parent_id,
             'children' => CategoryResource::collection($this->whenLoaded('children')),
+            'products_count' => $this->whenCounted('products'),
+            'children_count' => $this->whenCounted('children'),
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),
         ];

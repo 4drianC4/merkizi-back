@@ -1,0 +1,11 @@
+meta {
+  name: DELETE raw-material-categories.destroy
+  type: http
+  seq: 33
+}
+
+delete {
+  url: {{URLBase}}/api/v1/raw-material-categories/{{rawMaterialCategoryId}}
+  body: none
+  auth: none
+}

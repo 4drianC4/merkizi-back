@@ -1,0 +1,23 @@
+meta {
+  name: PATCH raw-material-categories.update
+  type: http
+  seq: 32
+}
+
+patch {
+  url: {{URLBase}}/api/v1/raw-material-categories/{{rawMaterialCategoryId}}
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Harinas",
+    "parent_id": null,
+    "status": "active"
+  }
+}

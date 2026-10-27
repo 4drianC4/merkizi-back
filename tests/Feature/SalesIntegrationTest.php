@@ -2,9 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Modules\Catalog\Models\Category;
 use App\Modules\Catalog\Models\Product;
 use App\Modules\Catalog\Models\ProductPrice;
 use App\Modules\Catalog\Models\ProductVariant;
+use App\Modules\Catalog\Models\RawMaterialCategory;
 use App\Modules\Sales\Models\DiningTable;
 use App\Modules\Sales\Models\Sale;
 use App\Modules\Sales\Models\TableAccount;
@@ -38,6 +40,47 @@ class SalesIntegrationTest extends TestCase
         $this->getJson('/api/v1/tables?status=free')->assertOk()->assertJsonCount(1, 'data');
         $this->getJson('/api/v1/sales/'.$saleId.'/audit')->assertOk()->assertJsonCount(5, 'data');
         $this->assertDatabaseHas('table_accounts', ['id' => $account['id'], 'status' => 'paid']);
+    }
+
+    public function test_raw_material_and_combined_categories_use_current_catalog_permissions(): void
+    {
+        $fixture = $this->salesFixture();
+        $category = RawMaterialCategory::factory()->create(['tenant_id' => $fixture['user']->tenant_id]);
+
+        $this->getJson('/api/v1/raw-material-categories')->assertOk()->assertJsonFragment(['id' => $category->id]);
+        $this->getJson('/api/v1/categories/all')->assertOk()->assertJsonFragment(['id' => $category->id]);
+        $this->postJson('/api/v1/raw-material-categories', ['name' => 'Insumos'])
+            ->assertCreated()->assertJsonPath('data.name', 'Insumos');
+        $this->assertDatabaseHas('raw_material_categories', ['tenant_id' => $fixture['user']->tenant_id, 'name' => 'Insumos']);
+
+        $permission = Permission::query()->where('code', 'catalogo.categorias.ver')->firstOrFail();
+        $fixture['user']->permissions()->attach($permission->id, ['granted' => false]);
+        $this->getJson('/api/v1/raw-material-categories')->assertForbidden();
+        $this->getJson('/api/v1/categories/all')->assertForbidden();
+    }
+
+    public function test_category_filters_preserve_children_counts_and_name_order(): void
+    {
+        $fixture = $this->salesFixture();
+        $tenantId = $fixture['user']->tenant_id;
+        $root = Category::factory()->create(['tenant_id' => $tenantId, 'name' => 'Zeta']);
+        $first = Category::factory()->create(['tenant_id' => $tenantId, 'parent_id' => $root->id, 'name' => 'Alfa']);
+        $second = Category::factory()->create(['tenant_id' => $tenantId, 'parent_id' => $root->id, 'name' => 'Beta']);
+        Category::factory()->create(['name' => 'Foreign']);
+        Product::factory()->create(['tenant_id' => $tenantId, 'category_id' => $root->id]);
+
+        $roots = $this->getJson('/api/v1/categories?parent_id=null')->assertOk();
+        $roots->assertJsonFragment(['id' => $root->id, 'products_count' => 1, 'children_count' => 2]);
+        $roots->assertJsonFragment(['id' => $first->id, 'parent_id' => $root->id]);
+        foreach ($roots->json('data') as $category) {
+            $this->assertNull($category['parent_id']);
+            $this->assertNotSame('Foreign', $category['name']);
+        }
+
+        $this->getJson('/api/v1/categories?parent_id='.$root->id)->assertOk()
+            ->assertJsonCount(2, 'data')->assertJsonPath('data.0.id', $first->id)
+            ->assertJsonPath('data.1.id', $second->id)->assertJsonPath('data.0.children', [])
+            ->assertJsonPath('data.0.products_count', 0)->assertJsonPath('data.0.children_count', 0);
     }
 
     public function test_catalog_prices_variants_and_extras_are_priced_on_the_server(): void
