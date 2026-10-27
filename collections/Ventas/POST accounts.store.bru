@@ -1,0 +1,34 @@
+meta {
+  name: POST accounts.store
+  type: http
+  seq: 75
+}
+
+post {
+  url: {{URLBase}}/api/v1/accounts
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "branch_id": "{{branchId}}",
+    "service_type": "table",
+    "table_id": "{{tableId}}",
+    "cash_session_id": "{{cashSessionId}}",
+    "customer_name": "Cliente de prueba",
+    "customer_tax_id": "123456",
+    "guests": 2,
+    "notes": "Sin restricciones"
+  }
+}
+
+docs {
+  Permiso: pos.venta.crear. Autenticación Sanctum y cuenta activa.
+  Abre cuenta de mesa. 201 data.id, status=open, version=1, total=0.00. Para llevar: service_type=takeaway y omitir table_id. cash_session_id es opcional; se exige caja abierta al cobrar/cerrar. No abre un pedido automáticamente.
+  IDs son UUID. La empresa procede del usuario autenticado; nunca enviar tenant_id.
+}

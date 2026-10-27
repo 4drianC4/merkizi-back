@@ -4,34 +4,32 @@ namespace App\Modules\Catalog\Policies;
 
 use App\Modules\Catalog\Models\Category;
 use App\Shared\Identity\Models\User;
-use App\Shared\Tenancy\Concerns\AuthorizesTenantMembership;
+use App\Shared\Tenancy\TenantContext;
 
 class CategoryPolicy
 {
-    use AuthorizesTenantMembership;
-
     public function viewAny(User $user): bool
     {
-        return $this->isMember($user, $this->tenant());
+        return $user->belongsToCompany(app(TenantContext::class)->requireTenant()) && $user->hasPermission('catalogo.categorias.ver');
     }
 
     public function view(User $user, Category $category): bool
     {
-        return $this->isMember($user, $category->tenant);
+        return $user->belongsToCompany($category->tenant) && $user->hasPermission('catalogo.categorias.ver');
     }
 
     public function create(User $user): bool
     {
-        return $this->isAdmin($user, $this->tenant());
+        return $user->belongsToCompany(app(TenantContext::class)->requireTenant()) && $user->hasPermission('catalogo.categorias.crear');
     }
 
     public function update(User $user, Category $category): bool
     {
-        return $this->isAdmin($user, $category->tenant);
+        return $user->belongsToCompany($category->tenant) && $user->hasPermission('catalogo.categorias.editar');
     }
 
     public function delete(User $user, Category $category): bool
     {
-        return $this->isAdmin($user, $category->tenant);
+        return $user->belongsToCompany($category->tenant) && $user->hasPermission('catalogo.categorias.eliminar');
     }
 }

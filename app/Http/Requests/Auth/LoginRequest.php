@@ -23,7 +23,7 @@ class LoginRequest extends FormRequest
 
     public function authenticate(): void
     {
-        if (! Auth::guard('web')->attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+        if (! Auth::guard('web')->attempt([...$this->only('email', 'password'), 'active' => true], $this->boolean('remember'))) {
             throw ValidationException::withMessages([
                 'email' => 'The provided credentials are incorrect.',
             ]);

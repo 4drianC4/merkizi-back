@@ -1,0 +1,17 @@
+meta {
+  name: GET sales.show
+  type: http
+  seq: 87
+}
+
+get {
+  url: {{URLBase}}/api/v1/sales/{{saleId}}
+  body: none
+  auth: none
+}
+
+docs {
+  Permiso: pos.venta.ver. Autenticación Sanctum y cuenta activa.
+  200 data: folio por sucursal, cajero, caja, cliente/NIT, precios/nombres históricos, descuentos, impuestos, propina, pagos, devoluciones, refunded_total y net_total. receipt.fiscal=false e invoice=null: no se emitió factura SIAT.
+  IDs son UUID. La empresa procede del usuario autenticado; nunca enviar tenant_id.
+}

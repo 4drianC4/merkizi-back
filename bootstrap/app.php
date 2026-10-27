@@ -1,6 +1,7 @@
 <?php
 
 use App\Shared\Exceptions\DomainException;
+use App\Shared\Identity\Http\Middleware\EnsureActiveAccount;
 use App\Shared\Tenancy\Http\Middleware\ResolveTenant;
 use App\Shared\Tenancy\TenancyServiceProvider;
 use Illuminate\Foundation\Application;
@@ -21,6 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'tenant' => ResolveTenant::class,
+            'active' => EnsureActiveAccount::class,
         ]);
 
         $middleware->prependToPriorityList(SubstituteBindings::class, ResolveTenant::class);

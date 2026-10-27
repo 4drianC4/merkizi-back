@@ -1,9 +1,9 @@
 <?php
 
+use App\Modules\Catalog\Http\Controllers\AllCategoriesController;
 use App\Modules\Catalog\Http\Controllers\CategoryController;
 use App\Modules\Catalog\Http\Controllers\ProductController;
 use App\Modules\Catalog\Http\Controllers\RawMaterialCategoryController;
-use App\Modules\Catalog\Http\Controllers\AllCategoriesController;
 use Illuminate\Support\Facades\Route;
 
 Route::get(

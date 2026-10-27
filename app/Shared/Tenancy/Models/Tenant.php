@@ -2,6 +2,7 @@
 
 namespace App\Shared\Tenancy\Models;
 
+use App\Shared\Identity\Models\User;
 use Database\Factories\Shared\Tenancy\Models\TenantFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -23,11 +24,11 @@ class Tenant extends Model
     ];
 
     /**
-     * @return HasMany<TenantMembership, $this>
+     * @return HasMany<User, $this>
      */
-    public function memberships(): HasMany
+    public function users(): HasMany
     {
-        return $this->hasMany(TenantMembership::class);
+        return $this->hasMany(User::class);
     }
 
     /**

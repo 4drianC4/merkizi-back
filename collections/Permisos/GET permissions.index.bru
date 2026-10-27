@@ -1,0 +1,19 @@
+meta {
+  name: GET permissions.index
+  type: http
+  seq: 100
+}
+
+get {
+  url: {{URLBase}}/api/v1/permissions
+  body: none
+  auth: none
+}
+
+docs {
+  Requiere roles.ver o usuarios.permisos. Devuelve los UUID y códigos del catálogo sembrado.
+  Copia el UUID del permiso a permissionId en las variables de esta solicitud o del entorno Bruno.
+  Nuevos códigos: caja.movimientos.crear, caja.sesiones.arquear, catalogo.stock.ver, pos.venta.descontar y pos.venta.anular.
+  Estos códigos quedan registrados; sus operaciones y validaciones específicas siguen pendientes.
+  Abrir caja usa caja.sesiones.abrir; cobrar usa pos.venta.cobrar; cerrar usa caja.sesiones.cerrar; catálogo usa catalogo.productos.ver.
+}

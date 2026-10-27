@@ -1,0 +1,17 @@
+meta {
+  name: GET accounts.open-tables
+  type: http
+  seq: 76
+}
+
+get {
+  url: {{URLBase}}/api/v1/accounts/open-tables?branch_id={{branchId}}
+  body: none
+  auth: none
+}
+
+docs {
+  Permiso: pos.venta.ver. Autenticación Sanctum y cuenta activa.
+  200 data[]: cuentas abiertas de mesas, pedidos, ítems, mesas, responsable, comensales, abonos, saldo y version. No incluye cuentas para llevar.
+  IDs son UUID. La empresa procede del usuario autenticado; nunca enviar tenant_id.
+}

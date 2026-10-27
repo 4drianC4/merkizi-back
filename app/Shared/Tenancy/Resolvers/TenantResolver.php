@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 interface TenantResolver
 {
     /**
-     * Resolve the tenant for the given request from an authorized membership.
+     * Resolve the tenant for the given request from the authenticated company account.
      */
     public function resolve(Request $request): ?Tenant;
 }

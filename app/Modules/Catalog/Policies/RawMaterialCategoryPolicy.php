@@ -4,34 +4,32 @@ namespace App\Modules\Catalog\Policies;
 
 use App\Modules\Catalog\Models\RawMaterialCategory;
 use App\Shared\Identity\Models\User;
-use App\Shared\Tenancy\Concerns\AuthorizesTenantMembership;
+use App\Shared\Tenancy\TenantContext;
 
 class RawMaterialCategoryPolicy
 {
-    use AuthorizesTenantMembership;
-
     public function viewAny(User $user): bool
     {
-        return $this->isMember($user, $this->tenant());
+        return $user->belongsToCompany(app(TenantContext::class)->requireTenant()) && $user->hasPermission('catalogo.categorias.ver');
     }
 
     public function view(User $user, RawMaterialCategory $rawMaterialCategory): bool
     {
-        return $this->isMember($user, $rawMaterialCategory->tenant);
+        return $user->belongsToCompany($rawMaterialCategory->tenant) && $user->hasPermission('catalogo.categorias.ver');
     }
 
     public function create(User $user): bool
     {
-        return $this->isAdmin($user, $this->tenant());
+        return $user->belongsToCompany(app(TenantContext::class)->requireTenant()) && $user->hasPermission('catalogo.categorias.crear');
     }
 
     public function update(User $user, RawMaterialCategory $rawMaterialCategory): bool
     {
-        return $this->isAdmin($user, $rawMaterialCategory->tenant);
+        return $user->belongsToCompany($rawMaterialCategory->tenant) && $user->hasPermission('catalogo.categorias.editar');
     }
 
     public function delete(User $user, RawMaterialCategory $rawMaterialCategory): bool
     {
-        return $this->isAdmin($user, $rawMaterialCategory->tenant);
+        return $user->belongsToCompany($rawMaterialCategory->tenant) && $user->hasPermission('catalogo.categorias.eliminar');
     }
 }

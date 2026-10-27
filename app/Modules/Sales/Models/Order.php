@@ -23,6 +23,7 @@ class Order extends Model
     use HasUuids;
 
     protected $fillable = [
+        'account_id', 'origin_table_id', 'responsible_user_id', 'number', 'version', 'service_type', 'notes',
         'tenant_id',
         'branch_id',
         'cash_session_id',
@@ -127,5 +128,11 @@ class Order extends Model
         }
 
         return false;
+    }
+
+    /** @return BelongsTo<TableAccount, $this> */
+    public function account(): BelongsTo
+    {
+        return $this->belongsTo(TableAccount::class, 'account_id');
     }
 }

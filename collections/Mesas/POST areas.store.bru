@@ -1,0 +1,29 @@
+meta {
+  name: POST areas.store
+  type: http
+  seq: 71
+}
+
+post {
+  url: {{URLBase}}/api/v1/areas
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "branch_id": "{{branchId}}",
+    "name": "Terraza",
+    "sort_order": 1
+  }
+}
+
+docs {
+  Permiso: salon.mesas.crear. Autenticación Sanctum y cuenta activa.
+  Crea un área en una sucursal asignada. 201 data.id; nombre único por sucursal.
+  IDs son UUID. La empresa procede del usuario autenticado; nunca enviar tenant_id.
+}

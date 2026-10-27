@@ -66,7 +66,7 @@ class CashSession extends Model
      */
     public function openedBy(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'opened_by');
+        return $this->belongsTo(User::class, 'opened_by')->withTrashed();
     }
 
     /**

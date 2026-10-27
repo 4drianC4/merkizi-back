@@ -1,0 +1,15 @@
+meta {
+  name: GET roles.index
+  type: http
+  seq: 103
+}
+
+get {
+  url: {{URLBase}}/api/v1/roles
+  body: none
+  auth: none
+}
+
+docs {
+  Requiere roles.ver. Usa el UUID devuelto como roleId en las variables de la solicitud o del entorno.
+}

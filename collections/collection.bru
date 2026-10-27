@@ -3,7 +3,7 @@ headers {
 }
 
 vars:pre-request {
-  URLBase: https://merkizi-back.onrender.com
+  URLBase: http://localhost:8080
   authentification: 
   email: test@example.com
   password: password
@@ -14,6 +14,20 @@ vars:pre-request {
   cashRegisterId: 00000000-0000-4000-8000-000000000000
   cashSessionId: 00000000-0000-4000-8000-000000000000
   orderId: 00000000-0000-4000-8000-000000000000
+  areaId: 00000000-0000-4000-8000-000000000000
+  tableId: 00000000-0000-4000-8000-000000000000
+  accountId: 00000000-0000-4000-8000-000000000000
+  saleId: 00000000-0000-4000-8000-000000000000
+  accountPaymentId: 00000000-0000-4000-8000-000000000000
+  orderItemId: 00000000-0000-4000-8000-000000000000
+  variantId: 00000000-0000-4000-8000-000000000000
+  extraProductId: 00000000-0000-4000-8000-000000000000
+  sourceAccountId: 00000000-0000-4000-8000-000000000000
+  destinationAccountId: 00000000-0000-4000-8000-000000000000
+  idempotencyKey: 00000000-0000-4000-8000-000000000000
+  orderVersion: 1
+  sourceVersion: 1
+  destinationVersion: 1
   storagePath: ejemplo.txt
   storageExpires: 
   storageSignature: 
@@ -52,6 +66,8 @@ docs {
   El logout requiere la sesión creada por login.
   URLBase debe coincidir con un dominio stateful configurado en Sanctum para el flujo de sesión.
   Ajusta las variables de IDs con los UUID devueltos al crear o listar registros existentes y accesibles por el usuario autenticado.
+  Ventas y Mesas implementan el flujo de integración de ventas; consulta VENTAS.md.
+  Cambia idempotencyKey por un UUID nuevo en cada cobro/cierre/devolución lógica; conserva el mismo para reintentar.
   Los cuerpos JSON son ejemplos editables; no se crean registros automáticamente.
   Las rutas GET también admiten HEAD. Se incluyen PUT y PATCH por separado.
   Sistema incluye inicio, salud, logs internos de Boost y almacenamiento con firmas temporales.

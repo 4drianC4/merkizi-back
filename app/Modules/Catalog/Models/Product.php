@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Product extends Model
@@ -60,7 +61,7 @@ class Product extends Model
     public function priceForBranch(?Branch $branch): string
     {
         if ($branch !== null) {
-            $override = $this->prices()->where('branch_id', $branch->id)->first();
+            $override = $this->relationLoaded('prices') ? $this->prices->firstWhere('branch_id', $branch->id) : $this->prices()->where('branch_id', $branch->id)->first();
 
             if ($override !== null) {
                 return (string) $override->price;
@@ -68,5 +69,17 @@ class Product extends Model
         }
 
         return (string) $this->price;
+    }
+
+    /** @return HasMany<ProductVariant, $this> */
+    public function variants(): HasMany
+    {
+        return $this->hasMany(ProductVariant::class);
+    }
+
+    /** @return BelongsToMany<Product, $this> */
+    public function extras(): BelongsToMany
+    {
+        return $this->belongsToMany(Product::class, 'product_extras', 'product_id', 'extra_product_id')->withPivot(['price', 'active']);
     }
 }

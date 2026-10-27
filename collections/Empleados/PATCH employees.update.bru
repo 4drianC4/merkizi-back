@@ -17,9 +17,15 @@ headers {
 body:json {
   {
     "name": "Empleado de prueba",
-    "branch_id": "{{branchId}}",
-    "user_id": null,
-    "role": "employee",
-    "status": "active"
+    "role_id": "{{roleId}}",
+    "branch_ids": [
+      "{{branchId}}"
+    ],
+    "primary_branch_id": "{{branchId}}"
   }
+}
+
+docs {
+  Obtén roleId desde GET roles.index y branchId desde GET branches.index.
+  Para personalizar permisos usa PUT employees.permissions.update después de crear el empleado.
 }

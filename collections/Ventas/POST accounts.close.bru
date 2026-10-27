@@ -1,0 +1,28 @@
+meta {
+  name: POST accounts.close
+  type: http
+  seq: 83
+}
+
+post {
+  url: {{URLBase}}/api/v1/accounts/{{accountId}}/close
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  Idempotency-Key: {{idempotencyKey}}
+}
+
+body:json {
+  {
+    "cash_session_id": "{{cashSessionId}}"
+  }
+}
+
+docs {
+  Permiso: pos.venta.cerrar. Autenticación Sanctum y cuenta activa.
+  Crea la venta histórica y libera todas las mesas de la cuenta. Exige pedidos, balance=0, pending=0 y caja abierta de la misma sucursal. Idempotency-Key obligatorio. Primera respuesta 201 data de venta; repetición idéntica 200 con el mismo ID. 409 account_unsettled si falta liquidar, idempotency_conflict si otra solicitud ya cerró la cuenta. receipt es comprobante interno no fiscal.
+  IDs son UUID. La empresa procede del usuario autenticado; nunca enviar tenant_id.
+}

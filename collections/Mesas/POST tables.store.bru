@@ -1,0 +1,30 @@
+meta {
+  name: POST tables.store
+  type: http
+  seq: 73
+}
+
+post {
+  url: {{URLBase}}/api/v1/tables
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "area_id": "{{areaId}}",
+    "number": "4",
+    "capacity": 4,
+    "blocked": false
+  }
+}
+
+docs {
+  Permiso: salon.mesas.crear. Autenticación Sanctum y cuenta activa.
+  201 data.id. El área determina empresa y sucursal. Número único dentro del área.
+  IDs son UUID. La empresa procede del usuario autenticado; nunca enviar tenant_id.
+}

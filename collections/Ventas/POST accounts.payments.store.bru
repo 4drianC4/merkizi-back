@@ -1,0 +1,41 @@
+meta {
+  name: POST accounts.payments.store
+  type: http
+  seq: 80
+}
+
+post {
+  url: {{URLBase}}/api/v1/accounts/{{accountId}}/payments
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  Idempotency-Key: {{idempotencyKey}}
+}
+
+body:json {
+  {
+    "cash_session_id": "{{cashSessionId}}",
+    "tip": "0.00",
+    "payments": [
+      {
+        "method": "cash",
+        "amount": "10.00",
+        "received_amount": "20.00"
+      },
+      {
+        "method": "qr",
+        "amount": "15.00",
+        "reference": "QR-0001"
+      }
+    ]
+  }
+}
+
+docs {
+  Permiso: pos.venta.cobrar. Autenticación Sanctum y cuenta activa.
+  Abono o pago mixto atómico. Idempotency-Key obligatorio UUID. amount es importe aplicado; received_amount es efectivo entregado, no el abono. 201 data[] con IDs, estados, cambio y account con saldo actualizado. Métodos: cash, qr, card, transfer. Solo cash se confirma al registrar; los demás requieren referencia y quedan pending. Ajustar importes al saldo real. tip se añade una sola vez por operación idempotente. La cuenta permanece open aunque balance=0.
+  IDs son UUID. La empresa procede del usuario autenticado; nunca enviar tenant_id.
+}

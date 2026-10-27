@@ -1,0 +1,17 @@
+meta {
+  name: GET areas.index
+  type: http
+  seq: 70
+}
+
+get {
+  url: {{URLBase}}/api/v1/areas?branch_id={{branchId}}
+  body: none
+  auth: none
+}
+
+docs {
+  Permiso: salon.mesas.ver. Autenticación Sanctum y cuenta activa.
+  Lista áreas de las sucursales asignadas. Respuesta 200: data[] con id, branch_id, name, sort_order y active.
+  IDs son UUID. La empresa procede del usuario autenticado; nunca enviar tenant_id.
+}

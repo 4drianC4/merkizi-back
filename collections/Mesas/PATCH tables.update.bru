@@ -1,0 +1,27 @@
+meta {
+  name: PATCH tables.update
+  type: http
+  seq: 74
+}
+
+patch {
+  url: {{URLBase}}/api/v1/tables/{{tableId}}
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "blocked": true
+  }
+}
+
+docs {
+  Permiso: salon.mesas.editar. Autenticación Sanctum y cuenta activa.
+  Admite blocked, active y capacity. 200 data. No se puede bloquear o desactivar una mesa ocupada: 409 table_occupied.
+  IDs son UUID. La empresa procede del usuario autenticado; nunca enviar tenant_id.
+}

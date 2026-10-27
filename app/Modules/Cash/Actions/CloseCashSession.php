@@ -3,6 +3,7 @@
 namespace App\Modules\Cash\Actions;
 
 use App\Modules\Cash\Models\CashSession;
+use App\Modules\Sales\Models\AccountPayment;
 use App\Shared\Exceptions\InvalidStateTransitionException;
 use App\Shared\Support\Money;
 use Illuminate\Support\Facades\DB;
@@ -12,7 +13,10 @@ class CloseCashSession
     public function handle(CashSession $session): CashSession
     {
         return DB::transaction(function () use ($session) {
-            $session->lockForUpdate();
+            $session = CashSession::query()->lockForUpdate()->findOrFail($session->id);
+            if (AccountPayment::query()->where('cash_session_id', $session->id)->where('status', 'pending')->exists()) {
+                throw new InvalidStateTransitionException('Resolve pending payments before closing the cash session.');
+            }
 
             if ($session->status !== 'open') {
                 throw new InvalidStateTransitionException('The cash session is already closed.');

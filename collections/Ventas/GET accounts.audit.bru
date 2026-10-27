@@ -1,0 +1,17 @@
+meta {
+  name: GET accounts.audit
+  type: http
+  seq: 88
+}
+
+get {
+  url: {{URLBase}}/api/v1/accounts/{{accountId}}/audit
+  body: none
+  auth: none
+}
+
+docs {
+  Permiso: pos.venta.auditoria. Autenticación Sanctum y cuenta activa.
+  200 data[] paginado (50 por página): operador, fecha, acción y datos. Incluye creación/edición de pedidos, pagos y resolución, unión, transferencias, cierre y devoluciones. Empresa y sucursal quedan asociadas al registro.
+  IDs son UUID. La empresa procede del usuario autenticado; nunca enviar tenant_id.
+}

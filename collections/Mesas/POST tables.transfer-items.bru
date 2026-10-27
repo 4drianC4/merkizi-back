@@ -1,0 +1,36 @@
+meta {
+  name: POST tables.transfer-items
+  type: http
+  seq: 85
+}
+
+post {
+  url: {{URLBase}}/api/v1/tables/transfer-items
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "source_account_id": "{{sourceAccountId}}",
+    "destination_account_id": "{{destinationAccountId}}",
+    "source_version": {{sourceVersion}},
+    "destination_version": {{destinationVersion}},
+    "items": [
+      {
+        "id": "{{orderItemId}}",
+        "quantity": "1.000"
+      }
+    ]
+  }
+}
+
+docs {
+  Permiso: salon.mesas.transferir. Autenticación Sanctum y cuenta activa.
+  Transfiere cantidades seleccionadas. Para todos los consumos, usar transfer_all=true y omitir items. Ambas cuentas deben estar abiertas, ser de mesa y estar en la misma sucursal. Para destino libre, abrir antes su cuenta. Pagos permanecen en origen; no se permite dejar consumo inferior a pagos confirmados+pendientes. Se prorratean descuentos/impuestos, conservando importes totales. La fuente vacía sin pagos se cancela y libera su mesa. 200 data destino.
+  IDs son UUID. La empresa procede del usuario autenticado; nunca enviar tenant_id.
+}

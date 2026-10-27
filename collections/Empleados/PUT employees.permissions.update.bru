@@ -1,0 +1,33 @@
+meta {
+  name: PUT employees.permissions.update
+  type: http
+  seq: 101
+}
+
+put {
+  url: {{URLBase}}/api/v1/employees/{{employeeId}}/permissions
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "permissions": [
+      {
+        "permission_id": "{{permissionId}}",
+        "granted": false
+      }
+    ]
+  }
+}
+
+docs {
+  Requiere usuarios.permisos y autoridad para administrar al empleado y el permiso seleccionado.
+  No permite modificar los permisos propios. granted=true concede; false deniega incluso si el rol lo concede.
+  IMPORTANTE: reemplaza todas las excepciones del empleado. Incluye todas las que quieras conservar.
+  Obtén permissionId desde GET permissions.index y employeeId desde GET employees.index.
+}

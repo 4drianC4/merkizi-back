@@ -1,0 +1,26 @@
+meta {
+  name: PUT employees.permissions.reset
+  type: http
+  seq: 102
+}
+
+put {
+  url: {{URLBase}}/api/v1/employees/{{employeeId}}/permissions
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "permissions": []
+  }
+}
+
+docs {
+  Restablecer por defecto: elimina TODAS las excepciones y restaura la herencia del rol.
+  Misma autorización que PUT employees.permissions.update.
+}

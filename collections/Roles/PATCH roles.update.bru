@@ -1,0 +1,30 @@
+meta {
+  name: PATCH roles.update
+  type: http
+  seq: 107
+}
+
+patch {
+  url: {{URLBase}}/api/v1/roles/{{roleId}}
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Cajero personalizado",
+    "description": "Rol de caja con permisos seleccionados",
+    "permission_ids": [
+      "{{permissionId}}"
+    ]
+  }
+}
+
+docs {
+  Requiere roles.editar. Solo roles de la empresa; no se pueden editar roles de sistema.
+  permission_ids reemplaza los permisos base del rol y afecta a sus usuarios.
+}

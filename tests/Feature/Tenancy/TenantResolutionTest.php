@@ -4,7 +4,6 @@ namespace Tests\Feature\Tenancy;
 
 use App\Shared\Identity\Models\User;
 use App\Shared\Tenancy\Models\Tenant;
-use App\Shared\Tenancy\Models\TenantMembership;
 use App\Shared\Tenancy\Resolvers\TenantResolver;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
@@ -14,74 +13,45 @@ class TenantResolutionTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_resolves_tenant_from_single_active_membership(): void
+    public function test_resolves_company_from_authenticated_user(): void
     {
         $user = User::factory()->create();
-        $tenant = Tenant::factory()->create();
-        TenantMembership::factory()->create([
-            'user_id' => $user->id,
-            'tenant_id' => $tenant->id,
-            'status' => 'active',
-        ]);
-
-        $request = $this->requestFor($user);
-
-        $resolved = app(TenantResolver::class)->resolve($request);
-
-        $this->assertNotNull($resolved);
-        $this->assertSame($tenant->id, $resolved->id);
+        $this->assertSame($user->tenant_id, app(TenantResolver::class)->resolve($this->requestFor($user))?->id);
     }
 
-    public function test_ignores_inactive_memberships(): void
+    public function test_ignores_inactive_accounts(): void
     {
-        $user = User::factory()->create();
-        $tenant = Tenant::factory()->create();
-        TenantMembership::factory()->create([
-            'user_id' => $user->id,
-            'tenant_id' => $tenant->id,
-            'status' => 'suspended',
-        ]);
-
-        $request = $this->requestFor($user);
-
-        $this->assertNull(app(TenantResolver::class)->resolve($request));
+        $user = User::factory()->inactive()->create();
+        $this->assertNull(app(TenantResolver::class)->resolve($this->requestFor($user)));
     }
 
     public function test_resolves_nothing_for_unauthenticated_request(): void
     {
-        $request = Request::create('/api/v1/anything', 'GET');
-
-        $this->assertNull(app(TenantResolver::class)->resolve($request));
+        $this->assertNull(app(TenantResolver::class)->resolve(Request::create('/api/v1/anything', 'GET')));
     }
 
-    public function test_session_selected_tenant_is_honored_when_authorized(): void
+    public function test_session_selected_company_cannot_override_user_company(): void
     {
         $user = User::factory()->create();
-        $first = Tenant::factory()->create();
-        $second = Tenant::factory()->create();
-        TenantMembership::factory()->create(['user_id' => $user->id, 'tenant_id' => $first->id]);
-        TenantMembership::factory()->create(['user_id' => $user->id, 'tenant_id' => $second->id]);
-
+        $other = Tenant::factory()->create();
         $request = $this->requestFor($user);
-        $request->session()->put('tenant_id', $second->id);
-
-        $resolved = app(TenantResolver::class)->resolve($request);
-
-        $this->assertSame($second->id, $resolved->id);
+        $request->session()->put('tenant_id', $other->id);
+        $request->headers->set('X-Tenant-ID', $other->id);
+        $request->query->set('tenant_id', $other->id);
+        $this->assertSame($user->tenant_id, app(TenantResolver::class)->resolve($request)?->id);
     }
 
-    public function test_session_selected_tenant_is_ignored_when_not_authorized(): void
+    public function test_superadmin_has_no_implicit_company(): void
     {
-        $user = User::factory()->create();
-        $tenant = Tenant::factory()->create();
-        TenantMembership::factory()->create(['user_id' => $user->id, 'tenant_id' => $tenant->id]);
+        $user = User::factory()->superAdmin()->create();
+        $this->assertNull(app(TenantResolver::class)->resolve($this->requestFor($user)));
+    }
 
-        $request = $this->requestFor($user);
-        $request->session()->put('tenant_id', 9999);
-
-        $resolved = app(TenantResolver::class)->resolve($request);
-
-        $this->assertSame($tenant->id, $resolved->id);
+    public function test_inactive_company_cannot_be_resolved(): void
+    {
+        $tenant = Tenant::factory()->create(['status' => 'inactive']);
+        $user = User::factory()->create(['tenant_id' => $tenant->id]);
+        $this->assertNull(app(TenantResolver::class)->resolve($this->requestFor($user)));
     }
 
     private function requestFor(User $user): Request

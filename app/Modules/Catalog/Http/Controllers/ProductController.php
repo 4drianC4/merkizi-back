@@ -10,7 +10,9 @@ use App\Modules\Catalog\Models\Category;
 use App\Modules\Catalog\Models\Product;
 use App\Shared\Exceptions\DomainException;
 use App\Shared\Tenancy\Concerns\ResolvesTenant;
+use App\Shared\Tenancy\Models\Branch;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 
@@ -18,11 +20,25 @@ class ProductController extends Controller
 {
     use ResolvesTenant;
 
-    public function index(): AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
         $this->authorize('viewAny', Product::class);
 
-        return ProductResource::collection(Product::query()->latest()->get());
+        $data = $request->validate(['branch_id' => ['sometimes', 'uuid'], 'category_id' => ['sometimes', 'uuid'],
+            'q' => ['sometimes', 'string', 'max:150'], 'available' => ['sometimes', 'boolean']]);
+        $this->catalogBranch($request);
+        $query = Product::query()->with(['variants', 'extras.prices', 'prices']);
+        if (isset($data['category_id'])) {
+            $query->where('category_id', $data['category_id']);
+        }
+        if (isset($data['q'])) {
+            $query->where('name', 'like', '%'.$data['q'].'%');
+        }
+        if ($request->boolean('available')) {
+            $query->where('status', 'active');
+        }
+
+        return ProductResource::collection($query->orderBy('name')->orderBy('id')->get());
     }
 
     public function store(StoreProductRequest $request): JsonResponse
@@ -45,11 +61,14 @@ class ProductController extends Controller
         return (new ProductResource($product))->response()->setStatusCode(201);
     }
 
-    public function show(Product $product): ProductResource
+    public function show(Request $request, Product $product): ProductResource
     {
         $this->authorize('view', $product);
 
-        return new ProductResource($product);
+        $request->validate(['branch_id' => ['sometimes', 'uuid']]);
+        $this->catalogBranch($request);
+
+        return new ProductResource($product->load(['variants', 'extras.prices', 'prices']));
     }
 
     public function update(UpdateProductRequest $request, Product $product): ProductResource
@@ -74,5 +93,14 @@ class ProductController extends Controller
         $product->update(['status' => 'inactive']);
 
         return response()->noContent();
+    }
+
+    private function catalogBranch(Request $request): void
+    {
+        if ($request->filled('branch_id')) {
+            $branch = Branch::query()->findOrFail($request->input('branch_id'));
+            abort_unless($request->user()->branches()->whereKey($branch->id)->where('status', 'active')->exists(), 403);
+            $request->attributes->set('catalog_branch', $branch);
+        }
     }
 }

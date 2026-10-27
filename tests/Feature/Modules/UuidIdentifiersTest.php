@@ -22,15 +22,16 @@ class UuidIdentifiersTest extends TestCase
         $branchId = $this->postJson('/api/v1/branches', ['name' => 'Sucursal UUID'])
             ->assertCreated()->json('data.id');
         $this->assertTrue(Str::isUuid($branchId));
-        $employeeId = $this->postJson('/api/v1/employees', ['name' => 'Empleado UUID', 'branch_id' => $branchId, 'user_id' => $user->id])
-            ->assertCreated()->assertJsonPath('data.branch_id', $branchId)->json('data.id');
+        $employeeId = $this->postJson('/api/v1/employees', ['name' => 'Empleado UUID', 'email' => 'uuid@example.com', 'password' => 'password', 'branch_ids' => [$branchId], 'role_id' => $user->role_id])
+            ->assertCreated()->assertJsonPath('data.branches.0.id', $branchId)->json('data.id');
         $this->assertTrue(Str::isUuid($employeeId));
         $this->getJson('/api/v1/employees/'.$employeeId)->assertOk()->assertJsonPath('data.id', $employeeId);
         $this->getJson('/api/v1/employees/1')->assertNotFound();
         $this->getJson('/api/v1/employees/not-a-uuid')->assertNotFound();
         $this->postJson('/api/v1/employees', ['name' => 'Invalid', 'branch_id' => 1])
             ->assertUnprocessable()->assertJsonValidationErrors('branch_id');
-        $this->assertDatabaseHas('employees', ['id' => $employeeId, 'branch_id' => $branchId, 'user_id' => $user->id]);
+        $this->assertDatabaseHas('users', ['id' => $employeeId, 'tenant_id' => $user->tenant_id]);
+        $this->assertDatabaseHas('branch_user', ['user_id' => $employeeId, 'branch_id' => $branchId]);
     }
 
     public function test_bearer_token_resolves_uuid_user(): void

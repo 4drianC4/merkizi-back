@@ -3,18 +3,18 @@
 namespace App\Modules\Catalog\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Modules\Catalog\Http\Requests\SearchCategoryRequest;
 use App\Modules\Catalog\Http\Requests\StoreCategoryRequest;
 use App\Modules\Catalog\Http\Requests\UpdateCategoryRequest;
-use App\Modules\Catalog\Http\Requests\SearchCategoryRequest;
 use App\Modules\Catalog\Http\Resources\CategoryResource;
 use App\Modules\Catalog\Http\Resources\CategorySelectResource;
 use App\Modules\Catalog\Models\Category;
 use App\Shared\Exceptions\DomainException;
 use App\Shared\Tenancy\Concerns\ResolvesTenant;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
-use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
@@ -25,6 +25,7 @@ class CategoryController extends Controller
         $this->authorize('viewAny', Category::class);
 
         $query = Category::query()
+            ->with('children')
             ->withCount(['products', 'children']);
 
         if ($request->has('parent_id')) {
@@ -35,7 +36,7 @@ class CategoryController extends Controller
             }
         }
 
-        return CategoryResource::collection($query->latest()->get());
+        return CategoryResource::collection($query->orderBy('name')->orderBy('id')->get());
     }
 
     public function store(StoreCategoryRequest $request): JsonResponse
