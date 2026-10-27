@@ -11,6 +11,8 @@ use App\Modules\Catalog\Models\Category;
 use App\Modules\Catalog\Models\Product;
 use App\Modules\Catalog\Policies\CategoryPolicy;
 use App\Modules\Catalog\Policies\ProductPolicy;
+use App\Modules\Catalog\Models\RawMaterialCategory;
+use App\Modules\Catalog\Policies\RawMaterialCategoryPolicy;
 use App\Modules\Sales\Models\Order;
 use App\Modules\Sales\Policies\OrderPolicy;
 use App\Modules\Staff\Models\Employee;
@@ -36,6 +38,7 @@ class AppServiceProvider extends ServiceProvider
     {
         Gate::policy(Branch::class, BranchPolicy::class);
         Gate::policy(Category::class, CategoryPolicy::class);
+        Gate::policy(RawMaterialCategory::class, RawMaterialCategoryPolicy::class);
         Gate::policy(Product::class, ProductPolicy::class);
         Gate::policy(Employee::class, EmployeePolicy::class);
         Gate::policy(CashRegister::class, CashRegisterPolicy::class);

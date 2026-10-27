@@ -17,3 +17,13 @@ Route::get(
 );
 Route::apiResource('categories', CategoryController::class);
 Route::apiResource('products', ProductController::class);
+
+Route::get(
+    'raw-material-categories/search',
+    [RawMaterialCategoryController::class, 'search']
+);
+Route::get(
+    'raw-material-categories/{raw_material_category}/subcategories',
+    [RawMaterialCategoryController::class, 'subcategories']
+);
+Route::apiResource('raw-material-categories', RawMaterialCategoryController::class);
